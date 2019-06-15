@@ -23,6 +23,11 @@ const puppeteer = require('puppeteer');
 
 const SEND = require('./methods/SEND');
 
+const idPrefix = {
+  DOM: 101,
+  CSS: 201,
+};
+
 (async() => {
   const launchOptions = {
     headless: false,
@@ -62,39 +67,55 @@ const SEND = require('./methods/SEND');
       },
     }
   )).result.sessionId;
+  console.log("sessionId:", sessionId);
 
   // Navigate the page using this session.
   await SEND.async(
     ws,
     {
       sessionId,
-      id: 1,  // Note that IDs are independent between sessions.
+      id: 1,
       method: 'Page.navigate',
       params: {
-        url: 'https://pptr.dev',
+        url: 'https://cn.bing.com',
       },
     }
   );
 
-  // let message = await SEND.async(
-  //   ws,
-  //   {
-  //     id: 1,
-  //     method: 'Browser.getWindowBounds',
-  //     params: {
-  //       windowId: 1,
-  //     }
-  //   }
-  // );
-  // console.log(message);
-
-  message = await SEND.async(
+  const DOM_agt_enabled = await SEND.async(
     ws,
     {
       sessionId,
-      id: 2,
-      method: 'Page.captureSnapshot',
+      id: idPrefix.DOM,
+      method: 'DOM.enable',
+    }
+  );
+  console.log("DOM agent enabled:", DOM_agt_enabled);
+  idPrefix.DOM++;
+
+  const CSS_agt_enabled = await SEND.async(
+    ws,
+    {
+      sessionId,
+      id: idPrefix.CSS,
+      method: 'CSS.enable',
+    }
+  );
+  console.log("CSS agent enabled:", CSS_agt_enabled);
+  idPrefix.DOM++;
+
+  const message = await SEND.async(
+    ws,
+    {
+      sessionId,
+      id: idPrefix.DOM,
+      method: 'DOM.getDocument',
     }
   );
   console.log(message);
+  idPrefix.DOM++;
 })();
+
+function expressSEND(type, method, option) {
+
+};
