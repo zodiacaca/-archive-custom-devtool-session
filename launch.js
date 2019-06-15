@@ -69,8 +69,8 @@ const profile = {
       flatten: true,
     },
   };
-  const rst_attach = await expressSEND(...Object.values(attachToTargetOptions));
-  profile.sId = rst_attach.sessionId;
+  const rsps_attach = await expressSEND(...Object.values(attachToTargetOptions));
+  profile.sId = rsps_attach.sessionId;
   console.log("sessionId:", profile.sId);
 
   // Navigate the page using this session.
@@ -106,12 +106,11 @@ const profile = {
 
 const expressSEND = async (method, options = null, state = null) => {
   const domain = getDomainName(method);
-  const sessionId = profile.sId;
   const id = getIncrementalId(domain);
-  const result = await SEND.async(
+  const response = await SEND.async(
     profile.ws,
     {
-      sessionId,
+      sessionId: profile.sId,
       id: id,
       method: method,
       params: options,
@@ -120,10 +119,10 @@ const expressSEND = async (method, options = null, state = null) => {
 
   return new Promise(resolve => {
     if (state) {
-      console.log(state, result);
+      console.log(state, response);
     }
 
-    resolve(result);
+    resolve(response);
   });
 };
 
