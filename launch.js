@@ -48,13 +48,13 @@ const profile = {
   const browser = await puppeteer.launch(launchOptions);
 
   // Create a websocket to issue CDP commands.
-  const ws = new WebSocket(browser.wsEndpoint(), { perMessageDeflate: false });
-  await new Promise(resolve => ws.once('open', resolve));
+  profile.ws = new WebSocket(browser.wsEndpoint(), { perMessageDeflate: false });
+  await new Promise(resolve => profile.ws.once('open', resolve));
   console.log('WebSocket connected!');
 
   // Get list of all targets and find a "page" target.
   const targets = await SEND.async(
-    ws,
+    profile.ws,
     {
       id: 1,
       method: 'Target.getTargets',
@@ -63,8 +63,8 @@ const profile = {
   const tgt_page = targets.result.targetInfos.find(info => info.type == 'page');
 
   // Attach to the page target.
-  const sessionId = (await SEND.async(
-    ws,
+  profile.sId = (await SEND.async(
+    profile.ws,
     {
       id: 2,
       method: 'Target.attachToTarget',
@@ -74,13 +74,13 @@ const profile = {
       },
     }
   )).result.sessionId;
-  console.log("sessionId:", sessionId);
+  console.log("sessionId:", profile.sId);
 
   // Navigate the page using this session.
   await SEND.async(
-    ws,
+    profile.ws,
     {
-      sessionId,
+      sessionId: profile.sId,
       id: 1,
       method: 'Page.navigate',
       params: {
@@ -95,7 +95,7 @@ const profile = {
     params: null,
     state: "DOM agent enabled:",
   };
-  expressSEND(...Object.values(enableDOMOptions));
+  await expressSEND(...Object.values(enableDOMOptions));
 
   const enableCSSOptions = {
     domain: 'CSS',
@@ -103,7 +103,7 @@ const profile = {
     params: null,
     state: "CSS agent enabled:",
   };
-  expressSEND(...Object.values(enableCSSOptions));
+  await expressSEND(...Object.values(enableCSSOptions));
 
   const getDocumentOptions = {
     domain: 'DOM',
@@ -111,7 +111,7 @@ const profile = {
     params: null,
     state: "Document:",
   };
-  expressSEND(...Object.values(getDocumentOptions));
+  await expressSEND(...Object.values(getDocumentOptions));
 })();
 
 const expressSEND = async (domain, method, options = null, state = null) => {
@@ -127,14 +127,16 @@ const expressSEND = async (domain, method, options = null, state = null) => {
     }
   );
 
-  if (state) {
-    console.log(state, result);
-  }
+  return new Promise(resolve => {
+    if (state) {
+      console.log(state, result);
+    }
 
-  return result;
+    resolve(result);
+  });
 };
 
-const getIncrementalId = async (domain) => {
+const getIncrementalId = (domain) => {
   idPrefix[domain]++;
 
   return idPrefix[domain];
