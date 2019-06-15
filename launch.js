@@ -70,7 +70,7 @@ const profile = {
     },
   };
   const rsps_attach = await expressSEND(...Object.values(attachToTargetOptions));
-  profile.sId = rsps_attach.sessionId;
+  profile.sId = rsps_attach.result.sessionId;
   console.log("sessionId:", profile.sId);
 
   // Navigate the page using this session.
