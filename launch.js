@@ -21,14 +21,21 @@ const config = readConfig(fs, __dirname + '/launch.json');
 const WebSocket = require('ws');
 const puppeteer = require('puppeteer');
 
-const SEND = require('./methods/SEND');
-
 const idPrefix = {
-  DOM: 101,
-  CSS: 201,
+  Target: 100,
+  Page: 200,
+  DOM: 300,
+  CSS: 400,
 };
 
-(async() => {
+const SEND = require('./methods/SEND');
+
+const profile = {
+  ws: undefined,
+  sId: undefined
+};
+
+(async () => {
   const launchOptions = {
     headless: false,
     executablePath: config.browser,
@@ -82,40 +89,53 @@ const idPrefix = {
     }
   );
 
-  const DOM_agt_enabled = await SEND.async(
-    ws,
-    {
-      sessionId,
-      id: idPrefix.DOM,
-      method: 'DOM.enable',
-    }
-  );
-  console.log("DOM agent enabled:", DOM_agt_enabled);
-  idPrefix.DOM++;
+  const enableDOMOptions = {
+    domain: 'DOM',
+    method: 'DOM.enable',
+    params: null,
+    state: "DOM agent enabled:",
+  };
+  expressSEND(...Object.values(enableDOMOptions));
 
-  const CSS_agt_enabled = await SEND.async(
-    ws,
-    {
-      sessionId,
-      id: idPrefix.CSS,
-      method: 'CSS.enable',
-    }
-  );
-  console.log("CSS agent enabled:", CSS_agt_enabled);
-  idPrefix.DOM++;
+  const enableCSSOptions = {
+    domain: 'CSS',
+    method: 'CSS.enable',
+    params: null,
+    state: "CSS agent enabled:",
+  };
+  expressSEND(...Object.values(enableCSSOptions));
 
-  const message = await SEND.async(
-    ws,
-    {
-      sessionId,
-      id: idPrefix.DOM,
-      method: 'DOM.getDocument',
-    }
-  );
-  console.log(message);
-  idPrefix.DOM++;
+  const getDocumentOptions = {
+    domain: 'DOM',
+    method: 'DOM.getDocument',
+    params: null,
+    state: "Document:",
+  };
+  expressSEND(...Object.values(getDocumentOptions));
 })();
 
-function expressSEND(type, method, option) {
+const expressSEND = async (domain, method, options = null, state = null) => {
+  const sessionId = profile.sId;
+  const id = getIncrementalId(domain);
+  const result = await SEND.async(
+    profile.ws,
+    {
+      sessionId,
+      id: id,
+      method: method,
+      params: options,
+    }
+  );
 
+  if (state) {
+    console.log(state, result);
+  }
+
+  return result;
+};
+
+const getIncrementalId = async (domain) => {
+  idPrefix[domain]++;
+
+  return idPrefix[domain];
 };
