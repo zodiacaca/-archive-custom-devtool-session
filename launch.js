@@ -52,6 +52,7 @@ const profile = {
   await new Promise(resolve => profile.ws.once('open', resolve));
   console.log('WebSocket connected!');
 
+
   // Get list of all targets and find a "page" target.
   const getTargetsOptions = {
     method: 'Target.getTargets',
@@ -68,8 +69,8 @@ const profile = {
       flatten: true,
     },
   };
-  const result_attach = await expressSEND(...Object.values(attachToTargetOptions));
-  profile.sId = result_attach.sessionId;
+  const rst_attach = await expressSEND(...Object.values(attachToTargetOptions));
+  profile.sId = rst_attach.sessionId;
   console.log("sessionId:", profile.sId);
 
   // Navigate the page using this session.
