@@ -53,44 +53,35 @@ const profile = {
   console.log('WebSocket connected!');
 
   // Get list of all targets and find a "page" target.
-  const targets = await SEND.async(
-    profile.ws,
-    {
-      id: 1,
-      method: 'Target.getTargets',
-    }
-  );
-  const tgt_page = targets.result.targetInfos.find(info => info.type == 'page');
+  const getTargetsOptions = {
+    method: 'Target.getTargets',
+    params: null,
+  };
+  const getTargets = await expressSEND(...Object.values(getTargetsOptions));
+  const tgt_page = getTargets.result.targetInfos.find(info => info.type == 'page');
 
   // Attach to the page target.
-  profile.sId = (await SEND.async(
-    profile.ws,
-    {
-      id: 2,
-      method: 'Target.attachToTarget',
-      params: {
-        targetId: tgt_page.targetId,
-        flatten: true,
-      },
-    }
-  )).result.sessionId;
+  const attachToTargetOptions = {
+    method: 'Target.attachToTarget',
+    params: {
+      targetId: tgt_page.targetId,
+      flatten: true,
+    },
+  };
+  const result_attach = await expressSEND(...Object.values(attachToTargetOptions));
+  profile.sId = result_attach.sessionId;
   console.log("sessionId:", profile.sId);
 
   // Navigate the page using this session.
-  await SEND.async(
-    profile.ws,
-    {
-      sessionId: profile.sId,
-      id: 1,
-      method: 'Page.navigate',
-      params: {
-        url: 'https://cn.bing.com',
-      },
-    }
-  );
+  const navigateOptions = {
+    method: 'Page.navigate',
+    params: {
+      url: 'https://cn.bing.com',
+    },
+  };
+  await expressSEND(...Object.values(navigateOptions));
 
   const enableDOMOptions = {
-    domain: 'DOM',
     method: 'DOM.enable',
     params: null,
     state: "DOM agent enabled:",
@@ -98,7 +89,6 @@ const profile = {
   await expressSEND(...Object.values(enableDOMOptions));
 
   const enableCSSOptions = {
-    domain: 'CSS',
     method: 'CSS.enable',
     params: null,
     state: "CSS agent enabled:",
@@ -106,7 +96,6 @@ const profile = {
   await expressSEND(...Object.values(enableCSSOptions));
 
   const getDocumentOptions = {
-    domain: 'DOM',
     method: 'DOM.getDocument',
     params: null,
     state: "Document:",
@@ -114,7 +103,8 @@ const profile = {
   await expressSEND(...Object.values(getDocumentOptions));
 })();
 
-const expressSEND = async (domain, method, options = null, state = null) => {
+const expressSEND = async (method, options = null, state = null) => {
+  const domain = getDomainName(method);
   const sessionId = profile.sId;
   const id = getIncrementalId(domain);
   const result = await SEND.async(
@@ -134,6 +124,12 @@ const expressSEND = async (domain, method, options = null, state = null) => {
 
     resolve(result);
   });
+};
+
+const getDomainName = (method) => {
+  const index = method.indexOf('.');
+
+  return method.substring(0, index);
 };
 
 const getIncrementalId = (domain) => {
