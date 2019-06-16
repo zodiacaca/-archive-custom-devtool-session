@@ -1,6 +1,6 @@
 
 module.exports = {
-  idPrefix: class {
+  DomainCodes: class {
     constructor() {
       this.Target = 100;
       this.Page = 200;

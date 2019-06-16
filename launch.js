@@ -22,7 +22,7 @@ const WebSocket = require('ws');
 const puppeteer = require('puppeteer');
 
 const classes = require('./classes/classes');
-const idPrefix = new classes.idPrefix();
+const DomainCodes = new classes.DomainCodes();
 
 const SEND = require('./methods/SEND');
 
@@ -129,7 +129,7 @@ const getDomainName = (method) => {
 };
 
 const getIncrementalId = (domain) => {
-  idPrefix[domain]++;
+  DomainCodes[domain]++;
 
-  return idPrefix[domain];
+  return DomainCodes[domain];
 };
