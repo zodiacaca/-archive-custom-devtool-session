@@ -21,12 +21,8 @@ const config = readConfig(fs, __dirname + '/launch.json');
 const WebSocket = require('ws');
 const puppeteer = require('puppeteer');
 
-const idPrefix = {
-  Target: 100,
-  Page: 200,
-  DOM: 300,
-  CSS: 400,
-};
+const classes = require('./classes/classes');
+const idPrefix = new classes.idPrefix();
 
 const SEND = require('./methods/SEND');
 
