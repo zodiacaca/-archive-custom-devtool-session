@@ -50,54 +50,55 @@ const profile = {
 
 
   // Get list of all targets and find a "page" target.
-  const getTargetsOptions = {
+  let getTargets = {
     method: 'Target.getTargets',
     params: null,
   };
-  const getTargets = await expressSEND(...Object.values(getTargetsOptions));
-  const tgt_page = getTargets.result.targetInfos.find(info => info.type == 'page');
+  getTargets = await expressSEND(...Object.values(getTargets));
+  const pageObj = getTargets.result.targetInfos.find(info => info.type == 'page');
 
   // Attach to the page target.
-  const attachToTargetOptions = {
+  let attachToTarget = {
     method: 'Target.attachToTarget',
     params: {
-      targetId: tgt_page.targetId,
+      targetId: pageObj.targetId,
       flatten: true,
     },
   };
-  const rsps_attach = await expressSEND(...Object.values(attachToTargetOptions));
-  profile.sId = rsps_attach.result.sessionId;
+  attachToTarget = await expressSEND(...Object.values(attachToTarget));
+  profile.sId = attachToTarget.result.sessionId;
   console.log("sessionId:", profile.sId);
 
   // Navigate the page using this session.
-  const navigateOptions = {
+  let navigate = {
     method: 'Page.navigate',
     params: {
       url: 'https://cn.bing.com',
     },
   };
-  await expressSEND(...Object.values(navigateOptions));
+  await expressSEND(...Object.values(navigate));
 
-  const enableDOMOptions = {
+  let enableDOMAgent = {
     method: 'DOM.enable',
     params: null,
     state: "DOM agent enabled:",
   };
-  await expressSEND(...Object.values(enableDOMOptions));
+  await expressSEND(...Object.values(enableDOMAgent));
 
-  const enableCSSOptions = {
+  let enableCSSAgent = {
     method: 'CSS.enable',
     params: null,
     state: "CSS agent enabled:",
   };
-  await expressSEND(...Object.values(enableCSSOptions));
+  await expressSEND(...Object.values(enableCSSAgent));
 
-  const getDocumentOptions = {
+  let getDocument = {
     method: 'DOM.getDocument',
     params: null,
     state: "Document:",
   };
-  await expressSEND(...Object.values(getDocumentOptions));
+  getDocument = await expressSEND(...Object.values(getDocument));
+  const nId = getDocument.result.root.nodeId;
 })();
 
 const expressSEND = async (method, options = null, state = null) => {
