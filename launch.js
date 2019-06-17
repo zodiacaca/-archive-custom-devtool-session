@@ -49,7 +49,6 @@ const profile = {
   console.log('WebSocket connected!');
 
 
-  // Get list of all targets and find a "page" target.
   let getTargets = {
     method: 'Target.getTargets',
     params: null,
@@ -57,7 +56,6 @@ const profile = {
   getTargets = await expressSEND(...Object.values(getTargets));
   const pageObj = getTargets.result.targetInfos.find(info => info.type == 'page');
 
-  // Attach to the page target.
   let attachToTarget = {
     method: 'Target.attachToTarget',
     params: {
@@ -69,7 +67,6 @@ const profile = {
   profile.sId = attachToTarget.result.sessionId;
   console.log("sessionId:", profile.sId);
 
-  // Navigate the page using this session.
   let navigate = {
     method: 'Page.navigate',
     params: {
