@@ -81,27 +81,24 @@ const profile = {
   let enableDOMAgent = {
     method: 'DOM.enable',
     params: null,
-    state: "DOM agent enabled:",
   };
   await expressSEND(...Object.values(enableDOMAgent));
 
   let enableCSSAgent = {
     method: 'CSS.enable',
     params: null,
-    state: "CSS agent enabled:",
   };
   await expressSEND(...Object.values(enableCSSAgent));
 
   let getDocument = {
     method: 'DOM.getDocument',
     params: null,
-    state: "Document:",
   };
   getDocument = await expressSEND(...Object.values(getDocument));
   const nId = getDocument.result.root.nodeId;
 })();
 
-const expressSEND = async (method, options = null, state = null) => {
+const expressSEND = async (method, options = null) => {
   const domain = getDomainName(method);
   const id = getIncrementalId(domain);
   const response = await SEND.async(
@@ -115,9 +112,7 @@ const expressSEND = async (method, options = null, state = null) => {
   );
 
   return new Promise(resolve => {
-    if (state) {
-      console.log(state, response);
-    }
+    console.log('\x1b[35m', method + ':', '\x1b[0m', response);
 
     resolve(response);
   });
