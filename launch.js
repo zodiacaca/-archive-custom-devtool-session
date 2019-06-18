@@ -103,7 +103,7 @@ const divideMethodString = (method) => {
 
   return {
     domain: method.substring(0, index),
-    command: method.substring(++index),
+    command: method.substring(index + 1),
   };
 };
 
