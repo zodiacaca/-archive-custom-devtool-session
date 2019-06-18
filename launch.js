@@ -30,6 +30,7 @@ const profile = {
   ws: undefined,
   sId: undefined
 };
+const results = new classes.Results();
 
 (async () => {
   const launchOptions = {
@@ -49,54 +50,35 @@ const profile = {
   console.log('WebSocket connected!');
 
 
-  let getTargets = {
-    method: 'Target.getTargets',
-    params: null,
-  };
-  getTargets = await expressSEND(...Object.values(getTargets));
-  const pageObj = getTargets.result.targetInfos.find(info => info.type == 'page');
+  await expressSEND('Target.getTargets');
+  const pageObj = results.getTargets[0].targetInfos.find(info => info.type == 'page');
 
-  let attachToTarget = {
-    method: 'Target.attachToTarget',
-    params: {
+  await expressSEND('Target.attachToTarget',
+    {
       targetId: pageObj.targetId,
       flatten: true,
     },
-  };
-  attachToTarget = await expressSEND(...Object.values(attachToTarget));
-  profile.sId = attachToTarget.result.sessionId;
+  );
+  profile.sId = results.attachToTarget[0].sessionId;
   console.log("sessionId:", profile.sId);
 
-  let navigate = {
-    method: 'Page.navigate',
-    params: {
+  await expressSEND('Page.navigate',
+    {
       url: 'https://cn.bing.com',
-    },
-  };
-  await expressSEND(...Object.values(navigate));
+    }
+  );
 
-  let enableDOMAgent = {
-    method: 'DOM.enable',
-    params: null,
-  };
-  await expressSEND(...Object.values(enableDOMAgent));
+  await expressSEND('DOM.enable');
 
-  let enableCSSAgent = {
-    method: 'CSS.enable',
-    params: null,
-  };
-  await expressSEND(...Object.values(enableCSSAgent));
+  await expressSEND('CSS.enable');
 
-  let getDocument = {
-    method: 'DOM.getDocument',
-    params: null,
-  };
-  getDocument = await expressSEND(...Object.values(getDocument));
-  const nId = getDocument.result.root.nodeId;
+  await expressSEND('DOM.getDocument');
+  console.log(results.getDocument[0]);
 })();
 
 const expressSEND = async (method, options = null) => {
-  const domain = getDomainName(method);
+  const domain = divideMethodString(method).domain;
+  const command = divideMethodString(method).command;
   const id = getIncrementalId(domain);
   const response = await SEND.async(
     profile.ws,
@@ -109,16 +91,20 @@ const expressSEND = async (method, options = null) => {
   );
 
   return new Promise(resolve => {
+    results.push(command, response.result);
     console.log('\x1b[35m', method + ':', '\x1b[0m', response);
 
     resolve(response);
   });
 };
 
-const getDomainName = (method) => {
+const divideMethodString = (method) => {
   const index = method.indexOf('.');
 
-  return method.substring(0, index);
+  return {
+    domain: method.substring(0, index),
+    command: method.substring(++index),
+  };
 };
 
 const getIncrementalId = (domain) => {
