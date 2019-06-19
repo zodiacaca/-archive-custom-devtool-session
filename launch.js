@@ -1,19 +1,19 @@
 
 const fs = require('fs');
 
-const options = {
-  persistent: true,
-  recursive: true,
-  encoding: 'utf8'
-};
-fs.watch('D:/DL/fdm', options, (eventType, filename) => {
-  console.log(`event type is: ${eventType}`);
-  if (filename) {
-    console.log(`filename is: ${filename}`);
-  } else {
-    console.log('filename not provided');
-  }
-});
+// const options = {
+//   persistent: true,
+//   recursive: true,
+//   encoding: 'utf8'
+// };
+// fs.watch('D:/DL/fdm', options, (eventType, filename) => {
+//   console.log(`event type is: ${eventType}`);
+//   if (filename) {
+//     console.log(`filename is: ${filename}`);
+//   } else {
+//     console.log('filename not provided');
+//   }
+// });
 
 const readConfig = require('./methods/readConfig');
 const config = readConfig(fs, __dirname + '/launch.json');
@@ -73,10 +73,37 @@ const results = new classes.Results();
   await expressSEND('CSS.enable');
 
   await expressSEND('DOM.getDocument');
-  console.log(results.getDocument[0]);
+  const rootId = results.getDocument[0].root.nodeId;
+
+  await expressSEND('DOM.querySelector',
+    {
+      nodeId: rootId,
+      selector: 'body',
+    },
+  );
+  const bodyId = results.querySelector[0].nodeId;
+
+  await expressSEND('CSS.getComputedStyleForNode',
+    {
+      nodeId: bodyId,
+    },
+  );
+  const styles = results.getComputedStyleForNode[0].computedStyle;
+  // for (let key in styles) {
+  //   console.log(styles[key]);
+  // }
+
+  await expressSEND('Page.captureScreenshot', null, true);
+  const data = results.captureScreenshot[0].data;
+  fs.writeFile("./tmp/data.txt", data, function(err) {
+    err ? console.log(err) : console.log("File saved!");
+  });
+  fs.writeFile("./tmp/out.png", data, 'base64', function(err) {
+    err ? console.log(err) : console.log("Image saved!");
+  });
 })();
 
-const expressSEND = async (method, options = null) => {
+const expressSEND = async (method, options = null, silence) => {
   const domain = divideMethodString(method).domain;
   const command = divideMethodString(method).command;
   const id = getIncrementalId(domain);
@@ -92,7 +119,9 @@ const expressSEND = async (method, options = null) => {
 
   return new Promise(resolve => {
     results.push(command, response.result);
-    console.log('\x1b[35m', method + ':', '\x1b[0m', response);
+    if (!silence) {
+     console.log('\x1b[35m', method + ':', '\x1b[0m', response);
+    }
 
     resolve(response);
   });
