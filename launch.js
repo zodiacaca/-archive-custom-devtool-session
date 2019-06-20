@@ -24,13 +24,6 @@ const puppeteer = require('puppeteer');
 const classes = require('./classes/classes');
 const DomainCodes = new classes.DomainCodes();
 
-const SEND = require('./methods/SEND');
-
-const profile = {
-  ws: undefined,
-  sId: undefined
-};
-const results = new classes.Results();
 
 (async () => {
   const launchOptions = {
@@ -45,86 +38,99 @@ const results = new classes.Results();
   const browser = await puppeteer.launch(launchOptions);
 
   // Create a websocket to issue CDP commands.
-  profile.ws = new WebSocket(browser.wsEndpoint(), { perMessageDeflate: false });
-  await new Promise(resolve => profile.ws.once('open', resolve));
+  const ws = new WebSocket(browser.wsEndpoint(), { perMessageDeflate: false });
+  await new Promise(resolve => ws.once('open', resolve));
   console.log('WebSocket connected!');
 
 
-  await expressSEND('Target.getTargets');
-  const pageObj = results.getTargets[0].targetInfos.find(info => info.type == 'page');
+  Order.SEND = require('./methods/SEND');
 
-  await expressSEND('Target.attachToTarget',
+  await Order.send('Target.getTargets');
+  const pageObj = Order.lastResult.targetInfos.find(info => info.type == 'page');
+
+  await Order.send('Target.attachToTarget',
     {
       targetId: pageObj.targetId,
       flatten: true,
     },
   );
-  profile.sId = results.attachToTarget[0].sessionId;
-  console.log("sessionId:", profile.sId);
+  Order.sessionId = Order.lastResult.sessionId;
 
-  await expressSEND('Page.navigate',
+  await Order.send('Page.navigate',
     {
       url: 'https://cn.bing.com',
     }
   );
 
-  await expressSEND('DOM.enable');
+  await Order.send('DOM.enable');
 
-  await expressSEND('CSS.enable');
+  await Order.send('CSS.enable');
 
-  await expressSEND('DOM.getDocument');
-  const rootId = results.getDocument[0].root.nodeId;
+  await Order.send('DOM.getDocument');
+  const rootId = Order.lastResult.root.nodeId;
 
-  await expressSEND('DOM.querySelector',
+  await Order.send('DOM.querySelector',
     {
       nodeId: rootId,
       selector: 'body',
     },
   );
-  const bodyId = results.querySelector[0].nodeId;
+  const bodyId = Order.lastResult.nodeId;
 
-  await expressSEND('CSS.getComputedStyleForNode',
+  await Order.send('CSS.getComputedStyleForNode',
     {
       nodeId: bodyId,
     },
   );
-  const styles = results.getComputedStyleForNode[0].computedStyle;
+  const styles = Order.lastResult.computedStyle;
   // for (let key in styles) {
   //   console.log(styles[key]);
   // }
 
-  await expressSEND('Page.captureScreenshot', null, true);
-  const data = results.captureScreenshot[0].data;
-  fs.writeFile("./tmp/data.txt", data, function(err) {
-    err ? console.log(err) : console.log("File saved!");
-  });
-  fs.writeFile("./tmp/out.png", data, 'base64', function(err) {
-    err ? console.log(err) : console.log("Image saved!");
-  });
+  await Order.send('Page.captureScreenshot', null, true);
+  const data = Order.lastResult.data;
+  // fs.writeFile("./tmp/data.txt", data, function(err) {
+  //   err ? console.log(err) : console.log("File saved!");
+  // });
+  // fs.writeFile("./tmp/out.png", data, 'base64', function(err) {
+  //   err ? console.log(err) : console.log("Image saved!");
+  // });
 })();
 
-const expressSEND = async (method, options = null, silence) => {
-  const domain = divideMethodString(method).domain;
-  const command = divideMethodString(method).command;
-  const id = getIncrementalId(domain);
-  const response = await SEND.async(
-    profile.ws,
-    {
-      sessionId: profile.sId,
-      id: id,
-      method: method,
-      params: options,
-    }
-  );
+const Order = {
+  send: async (method, options = null, silence) => {
+    const domain = divideMethodString(method).domain;
+    const command = divideMethodString(method).command;
+    const id = getIncrementalId(domain);
+    const response = await this.SEND.async(
+      profile.ws,
+      {
+        sessionId: this.sessionId,
+        id: id,
+        method: method,
+        params: options,
+      }
+    );
 
-  return new Promise(resolve => {
-    results.push(command, response.result);
-    if (!silence) {
-     console.log('\x1b[35m', method + ':', '\x1b[0m', response);
-    }
+    return new Promise(resolve => {
+      const result = envelopResult(response.result, method);
+      this.results.push(result);
+      if (!silence) {
+      console.log('\x1b[35m', method + ':', '\x1b[0m', response);
+      }
 
-    resolve(response);
-  });
+      resolve(response);
+    });
+  },
+
+  results: [],
+
+  get lastResult() {
+    const len = this.results.length;
+    const rst = this.results[len - 1];
+
+    return len > 0 ? rst : null;
+  },
 };
 
 const divideMethodString = (method) => {
@@ -140,4 +146,10 @@ const getIncrementalId = (domain) => {
   DomainCodes[domain]++;
 
   return DomainCodes[domain];
+};
+
+const envelopResult = (result, method) => {
+  result.method = method;
+
+  return result;
 };

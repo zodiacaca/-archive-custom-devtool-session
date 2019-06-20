@@ -8,14 +8,4 @@ module.exports = {
       this.CSS = 400;
     }
   },
-  Results: class {
-    constructor() {}
-
-    push(operate, result) {
-      if (this[operate] == undefined) {
-        this[operate] = [];
-      }
-      this[operate].push(result);
-    }
-  },
 }
