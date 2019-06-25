@@ -43,33 +43,35 @@ const DomainCodes = new classes.DomainCodes();
   console.log('WebSocket connected!');
 
 
-  Order.SEND = require('./methods/SEND');
+  // const Order = new classes.Order(ws, require('./methods/SEND'));
+  Order.Send = require('./methods/SEND');
+  Order.WebSocket = ws;
 
-  await Order.send('Target.getTargets');
-  const pageObj = Order.lastResult.targetInfos.find(info => info.type == 'page');
+  await Order.Send('Target.getTargets');
+  const pageInfo = Order.lastResult.targetInfos.find(info => info.type == 'page');
 
-  await Order.send('Target.attachToTarget',
+  await Order.Send('Target.attachToTarget',
     {
-      targetId: pageObj.targetId,
+      targetId: pageInfo.targetId,
       flatten: true,
     },
   );
-  Order.sessionId = Order.lastResult.sessionId;
+  Order.SessionID = Order.lastResult.sessionId;
 
-  await Order.send('Page.navigate',
+  await Order.Send('Page.navigate',
     {
       url: 'https://cn.bing.com',
     }
   );
 
-  await Order.send('DOM.enable');
+  await Order.Send('DOM.enable');
 
-  await Order.send('CSS.enable');
+  await Order.Send('CSS.enable');
 
-  await Order.send('DOM.getDocument');
+  await Order.Send('DOM.getDocument');
   const rootId = Order.lastResult.root.nodeId;
 
-  await Order.send('DOM.querySelector',
+  await Order.Send('DOM.querySelector',
     {
       nodeId: rootId,
       selector: 'body',
@@ -77,7 +79,7 @@ const DomainCodes = new classes.DomainCodes();
   );
   const bodyId = Order.lastResult.nodeId;
 
-  await Order.send('CSS.getComputedStyleForNode',
+  await Order.Send('CSS.getComputedStyleForNode',
     {
       nodeId: bodyId,
     },
@@ -87,7 +89,7 @@ const DomainCodes = new classes.DomainCodes();
   //   console.log(styles[key]);
   // }
 
-  await Order.send('Page.captureScreenshot', null, true);
+  await Order.Send('Page.captureScreenshot', null, true);
   const data = Order.lastResult.data;
   // fs.writeFile("./tmp/data.txt", data, function(err) {
   //   err ? console.log(err) : console.log("File saved!");
@@ -98,14 +100,14 @@ const DomainCodes = new classes.DomainCodes();
 })();
 
 const Order = {
-  send: async (method, options = null, silence) => {
+  Send: async (method, options = null, silence) => {
     const domain = divideMethodString(method).domain;
     const command = divideMethodString(method).command;
     const id = getIncrementalId(domain);
     const response = await this.SEND.async(
-      profile.ws,
+      this.WebSocket,
       {
-        sessionId: this.sessionId,
+        sessionId: this.SessionID,
         id: id,
         method: method,
         params: options,
@@ -113,10 +115,10 @@ const Order = {
     );
 
     return new Promise(resolve => {
-      const result = envelopResult(response.result, method);
+      const result = bindResult(response.result, method);
       this.results.push(result);
       if (!silence) {
-      console.log('\x1b[35m', method + ':', '\x1b[0m', response);
+        console.log('\x1b[35m', method + ':', '\x1b[0m', response);
       }
 
       resolve(response);
@@ -148,7 +150,7 @@ const getIncrementalId = (domain) => {
   return DomainCodes[domain];
 };
 
-const envelopResult = (result, method) => {
+const bindResult = (result, method) => {
   result.method = method;
 
   return result;
