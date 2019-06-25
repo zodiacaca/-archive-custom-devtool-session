@@ -115,7 +115,13 @@ const Order = {
     );
 
     return new Promise(resolve => {
-      const result = bindResult(response.result, method);
+      let result;
+      try {
+        result = bindResult(response.result, method);
+      }
+      catch (e) {
+        console.error('\x1b[31m', "Bad!");
+      }
       this.results.push(result);
       if (!silence) {
         console.log('\x1b[35m', method + ':', '\x1b[0m', response);
