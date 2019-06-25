@@ -44,7 +44,7 @@ const DomainCodes = new classes.DomainCodes();
 
 
   // const Order = new classes.Order(ws, require('./methods/SEND'));
-  Order.Send = require('./methods/SEND');
+  Order.SEND = require('./methods/SEND');
   Order.WebSocket = ws;
 
   await Order.Send('Target.getTargets');
@@ -100,7 +100,7 @@ const DomainCodes = new classes.DomainCodes();
 })();
 
 const Order = {
-  Send: async (method, options = null, silence) => {
+  Send: async function (method, options = null, silence) {
     const domain = divideMethodString(method).domain;
     const command = divideMethodString(method).command;
     const id = getIncrementalId(domain);
