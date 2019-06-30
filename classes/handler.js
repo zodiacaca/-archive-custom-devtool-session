@@ -29,7 +29,7 @@ module.exports = {
       this.rSuccessCount = 0;
       this.rHistoryCount = 0;
       this.rLastOrder = undefined;
-      this.rAttempts = 5;
+      this.rMaximumNumberOfAttempts = 5;
     }
 
     async Send(method, options = null, silence = false, retry = false) {
@@ -73,7 +73,7 @@ module.exports = {
       let result = this.results[this.rHistoryCount - 1];
 
       if (!result) {
-        for (let i = 0; i < this.rAttempts; i++) {
+        for (let i = 0; i < this.rMaximumNumberOfAttempts; i++) {
           const response = await this.retryLastOrder();
           if (!response.code && response.result) {
             result = this.results[this.rHistoryCount - 1];
