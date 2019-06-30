@@ -26,10 +26,10 @@ module.exports = {
       this.results = [];
       this.SessionID = undefined;
       // retry relative
-      this._SuccessCount = 0;
-      this._HistoryCount = 0;
-      this._LastOrder = undefined;
-      this._RetryCount = 5;
+      this.rSuccessCount = 0;
+      this.rHistoryCount = 0;
+      this.rLastOrder = undefined;
+      this.rAttempts = 5;
     }
 
     async Send(method, options = null, silence = false, retry = false) {
@@ -49,7 +49,7 @@ module.exports = {
       return new Promise(resolve => {
         if (!response.code && response.result) {
           this.results.push(response);
-          this._SuccessCount++;
+          this.rSuccessCount++;
         } else {
           if (retry) {
             console.log('\x1b[31m', "Bad! Retry again!", '\x1b[0m');
@@ -58,9 +58,9 @@ module.exports = {
           }
         }
         if (!retry) {
-          this._HistoryCount++;
+          this.rHistoryCount++;
         }
-        this._LastOrder = { m: method, o: options };
+        this.rLastOrder = { m: method, o: options };
         if (!silence) {
           console.log('\x1b[35m', method + ':', '\x1b[0m', response);
         }
@@ -70,13 +70,13 @@ module.exports = {
     }
 
     async getlastResult() {
-      let result = this.results[this._HistoryCount - 1];
+      let result = this.results[this.rHistoryCount - 1];
 
       if (!result) {
-        for (let i = 0; i < this._RetryCount; i++) {
+        for (let i = 0; i < this.rAttempts; i++) {
           const response = await this.retryLastOrder();
           if (!response.code && response.result) {
-            result = this.results[this._HistoryCount - 1];
+            result = this.results[this.rHistoryCount - 1];
             break;
           } else {
             console.error(response);
@@ -86,7 +86,7 @@ module.exports = {
 
       if (result) {
         return new Promise(resolve => {
-          const result = this._SuccessCount > 0 ? result : null;
+          const result = this.rSuccessCount > 0 ? result : null;
           resolve(result);
         });
       }
@@ -96,7 +96,7 @@ module.exports = {
 
       return new Promise(resolve => {
         setTimeout(async () => {
-          const response = await this.Send(this._LastOrder.m, this._LastOrder.o, true, true);
+          const response = await this.Send(this.rLastOrder.m, this.rLastOrder.o, true, true);
           resolve(response);
         }, 500);
       });
