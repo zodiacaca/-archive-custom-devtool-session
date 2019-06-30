@@ -32,7 +32,7 @@ module.exports = {
       this.rMaximumNumberOfAttempts = 5;
     }
 
-    async Send(method, options = null, silence = false, retry = false) {
+    static async Send(method, options = null, silence = false, retry = false) {
       const domain = divideMethodString(method).domain;
       const command = divideMethodString(method).command;
       const id = getIncrementalId(domain);
@@ -92,7 +92,7 @@ module.exports = {
       }
     }
 
-    retryLastOrder() {
+    static retryLastOrder() {
 
       return new Promise(resolve => {
         setTimeout(async () => {
