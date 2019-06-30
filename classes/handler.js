@@ -18,12 +18,6 @@ const getIncrementalId = (domain) => {
   return DomainCodes[domain];
 };
 
-const bindResult = (result, method) => {
-  result.method = method;
-
-  return result;
-};
-
 module.exports = {
   Order: class {
     constructor(ws, helper) {
@@ -31,9 +25,14 @@ module.exports = {
       this.SEND = helper;
       this.results = [];
       this.SessionID = undefined;
+      // retry relative
+      this._SuccessCount = 0;
+      this._HistoryCount = 0;
+      this._LastOrder = undefined;
+      this._RetryCount = 5;
     }
 
-    async Send(method, options = null, silence) {
+    async Send(method, options = null, silence = false, retry = false) {
       const domain = divideMethodString(method).domain;
       const command = divideMethodString(method).command;
       const id = getIncrementalId(domain);
@@ -48,14 +47,20 @@ module.exports = {
       );
 
       return new Promise(resolve => {
-        let result;
-        try {
-          result = bindResult(response.result, method);
+        if (!response.code && response.result) {
+          this.results.push(response);
+          this._SuccessCount++;
+        } else {
+          if (retry) {
+            console.log('\x1b[31m', "Bad! Retry again!", '\x1b[0m');
+          } else {
+            console.log('\x1b[31m', "Bad!", '\x1b[0m');
+          }
         }
-        catch (e) {
-          console.error('\x1b[31m', "Bad!");
+        if (!retry) {
+          this._HistoryCount++;
         }
-        this.results.push(result);
+        this._LastOrder = { m: method, o: options };
         if (!silence) {
           console.log('\x1b[35m', method + ':', '\x1b[0m', response);
         }
@@ -64,11 +69,37 @@ module.exports = {
       });
     }
 
-    get lastResult() {
-      const len = this.results.length;
-      const rst = this.results[len - 1];
+    async getlastResult() {
+      let result = this.results[this._HistoryCount - 1];
 
-      return len > 0 ? rst : null;
+      if (!result) {
+        for (let i = 0; i < this._RetryCount; i++) {
+          const response = await this.retryLastOrder();
+          if (!response.code && response.result) {
+            result = this.results[this._HistoryCount - 1];
+            break;
+          } else {
+            console.error(response);
+          }
+        }
+      }
+
+      if (result) {
+        return new Promise(resolve => {
+          const result = this._SuccessCount > 0 ? result : null;
+          resolve(result);
+        });
+      }
+    }
+
+    retryLastOrder() {
+
+      return new Promise(resolve => {
+        setTimeout(async () => {
+          const response = await this.Send(this._LastOrder.m, this._LastOrder.o, true, true);
+          resolve(response);
+        }, 500);
+      });
     }
   },
 }

@@ -45,7 +45,7 @@ const handler = require('./classes/handler');
   const Order = new handler.Order(ws, require('./methods/SEND'));
 
   await Order.Send('Target.getTargets');
-  const pageInfo = Order.lastResult.targetInfos.find(info => info.type == 'page');
+  const pageInfo = (await Order.getlastResult()).targetInfos.find(info => info.type == 'page');
 
   await Order.Send('Target.attachToTarget',
     {
@@ -53,7 +53,7 @@ const handler = require('./classes/handler');
       flatten: true,
     },
   );
-  Order.SessionID = Order.lastResult.sessionId;
+  Order.SessionID = (await Order.getlastResult()).sessionId;
 
   await Order.Send('Page.navigate',
     {
@@ -66,7 +66,7 @@ const handler = require('./classes/handler');
   await Order.Send('CSS.enable');
 
   await Order.Send('DOM.getDocument');
-  const rootId = Order.lastResult.root.nodeId;
+  const rootId = (await Order.getlastResult()).root.nodeId;
 
   await Order.Send('DOM.querySelector',
     {
@@ -74,20 +74,20 @@ const handler = require('./classes/handler');
       selector: 'body',
     },
   );
-  const bodyId = Order.lastResult.nodeId;
+  const bodyId = (await Order.getlastResult()).nodeId;
 
   await Order.Send('CSS.getComputedStyleForNode',
     {
       nodeId: bodyId,
     },
   );
-  const styles = Order.lastResult.computedStyle;
+  const styles = (await Order.getlastResult()).computedStyle;
   // for (let key in styles) {
   //   console.log(styles[key]);
   // }
 
   await Order.Send('Page.captureScreenshot', null, true);
-  const data = Order.lastResult.data;
+  const data = (await Order.getlastResult()).data;
   // fs.writeFile("./tmp/data.txt", data, function(err) {
   //   err ? console.log(err) : console.log("File saved!");
   // });
