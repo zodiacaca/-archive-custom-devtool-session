@@ -21,7 +21,7 @@ const config = readConfig(fs, __dirname + '/launch.json');
 const WebSocket = require('ws');
 const puppeteer = require('puppeteer');
 
-const deliver = require('./classes/deliver');
+const deliverer = require('./classes/deliverer');
 
 
 (async () => {
@@ -42,7 +42,7 @@ const deliver = require('./classes/deliver');
   console.log('WebSocket connected!');
 
 
-  const Order = new deliver.Order(ws, require('./classes/handler'));
+  const Order = new deliverer.Order(ws, require('./classes/handler'));
 
   await Order.Send('Target.getTargets');
   const pageInfo = (await Order.getLastResult()).targetInfos.find(info => info.type == 'page');
