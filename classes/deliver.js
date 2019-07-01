@@ -20,9 +20,9 @@ const getIncrementalId = (domain) => {
 
 module.exports = {
   Order: class {
-    constructor(ws, helper) {
+    constructor(ws, handler) {
       this.WebSocket = ws;
-      this.SEND = helper;
+      this.Handler = handler;
       this.results = [];
       this.SessionID = undefined;
       // retry relative
@@ -37,7 +37,7 @@ module.exports = {
       const domain = divideMethodString(method).domain;
       const command = divideMethodString(method).command;
       const id = getIncrementalId(domain);
-      const response = await this.SEND.async(
+      const response = await this.Handler.async(
         this.WebSocket,
         {
           sessionId: this.SessionID,
