@@ -49,7 +49,7 @@ module.exports = {
 
       return new Promise(resolve => {
         if (!response.code && response.result) {
-          this.results.push(response);
+          this.results.push(response.result);
           this.rSuccessCount++;
         } else {
           if (retry) {
