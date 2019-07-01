@@ -18,6 +18,12 @@ const getIncrementalId = (domain) => {
   return DomainCodes[domain];
 };
 
+const stampResult = (rst, stp) => {
+  rst.stamp = stp;
+
+  return rst;
+};
+
 module.exports = {
   Order: class {
     constructor(ws, handler) {
@@ -33,7 +39,7 @@ module.exports = {
     }
 
     // static async Send(method, options = null, silence = false, retry = false) {
-    async Send(method, options = null, silence = false, retry = false) {
+    async Send(method, options = null, retry = false) {
       const domain = divideMethodString(method).domain;
       const command = divideMethodString(method).command;
       const id = getIncrementalId(domain);
@@ -49,9 +55,15 @@ module.exports = {
 
       return new Promise(resolve => {
         if (!response.code && response.result) {
-          this.results.push(response.result);
+          const stamp = {
+            id: id,
+            method: method,
+          };
+          const result = stampResult(response.result, stamp);
+          this.results.push(result);
           this.rSuccessCount++;
         } else {
+          console.log('\x1b[35m', method + ':', '\x1b[0m', response);
           if (retry) {
             console.log('\x1b[31m', "Bad! Retry again!", '\x1b[0m');
           } else {
@@ -62,9 +74,6 @@ module.exports = {
           this.rHistoryCount++;
         }
         this.rLastOrder = { m: method, o: options };
-        if (!silence) {
-          console.log('\x1b[35m', method + ':', '\x1b[0m', response);
-        }
 
         resolve(response);
       });
@@ -94,14 +103,15 @@ module.exports = {
     }
 
     printLastResult() {
-
+      let rst = this.results[this.rHistoryCount - 1];
+      console.log('\x1b[35m', 'Result:', '\x1b[0m', rst);
     }
 
     static retryLastOrder() {
 
       return new Promise(resolve => {
         setTimeout(async () => {
-          const response = await this.Send(this.rLastOrder.m, this.rLastOrder.o, true, true);
+          const response = await this.Send(this.rLastOrder.m, this.rLastOrder.o, true);
           resolve(response);
         }, 500);
       });

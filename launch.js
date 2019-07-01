@@ -86,7 +86,7 @@ const deliverer = require('./classes/deliverer');
   //   console.log(styles[key]);
   // }
 
-  await Order.Send('Page.captureScreenshot', null, true);
+  await Order.Send('Page.captureScreenshot');
   const data = (await Order.getLastResult()).data;
   // fs.writeFile("./tmp/data.txt", data, function(err) {
   //   err ? console.log(err) : console.log("File saved!");
