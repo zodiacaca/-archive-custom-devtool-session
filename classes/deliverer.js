@@ -87,8 +87,8 @@ module.exports = {
 
       if (result) {
         return new Promise(resolve => {
-          const result = this.rSuccessCount > 0 ? result : null;
-          resolve(result);
+          const rst = this.rSuccessCount > 0 ? result : null;
+          resolve(rst);
         });
       }
     }
