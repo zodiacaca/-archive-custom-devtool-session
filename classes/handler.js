@@ -32,7 +32,8 @@ module.exports = {
       this.rMaximumNumberOfAttempts = 5;
     }
 
-    static async Send(method, options = null, silence = false, retry = false) {
+    // static async Send(method, options = null, silence = false, retry = false) {
+    async Send(method, options = null, silence = false, retry = false) {
       const domain = divideMethodString(method).domain;
       const command = divideMethodString(method).command;
       const id = getIncrementalId(domain);
@@ -69,7 +70,7 @@ module.exports = {
       });
     }
 
-    async getlastResult() {
+    async getLastResult() {
       let result = this.results[this.rHistoryCount - 1];
 
       if (!result) {
@@ -90,6 +91,10 @@ module.exports = {
           resolve(result);
         });
       }
+    }
+
+    printLastResult() {
+
     }
 
     static retryLastOrder() {
