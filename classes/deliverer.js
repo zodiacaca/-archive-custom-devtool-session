@@ -38,8 +38,7 @@ module.exports = {
       this.rMaximumNumberOfAttempts = 5;
     }
 
-    // static async Send(method, options = null, silence = false, retry = false) {
-    async Send(method, options = null, retry = false) {
+    static async Send(method, options = null, retry = false) {
       const domain = divideMethodString(method).domain;
       const command = divideMethodString(method).command;
       const id = getIncrementalId(domain);
