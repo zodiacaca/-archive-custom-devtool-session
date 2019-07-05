@@ -54,19 +54,19 @@ const Path = require('path')
     }
   }
 
-  page.on('response', (response) => {
+  page.on('response', async (response) => {
     const status = response.status()
     if (status >= 300 && status <= 399) {
       console.log('Ignore redirection to', response.headers().location)
     } else {
       const url = new URL(response.url())
       const path = url.pathname
-      let out = '/tmp/static' + path
+      let out = './tmp/static' + path
       const resolvable = checkResolvable(path)
-      if (resolvable.indexOf('.') == 0) {
-        fse.outputFile(out, await response.buffer())
-      } else if (resolvable == 'index') {
-        out += 'index.html'
+      if (resolvable) {
+        if (resolvable == 'index') {
+          out += 'index.html'
+        }
         fse.outputFile(out, await response.buffer())
       }
     }
