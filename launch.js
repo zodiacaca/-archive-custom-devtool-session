@@ -71,7 +71,7 @@ const Path = require('path')
         if (resolvable == 'index' || resolvable.indexOf('html') >= 0) {
           const text = buffer.toString('utf8')
           const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}/g
-          const html = text.replace(regex, 'http://127.0.0.1')
+          const html = text.replace(regex, 'http://127.0.0.1:3000')
 
           fse.outputFile(out, html)
         } else {
