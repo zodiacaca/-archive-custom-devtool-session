@@ -22,9 +22,13 @@ const Path = require('path')
     ]
   }
   const browser = await puppeteer.launch(launchOptions)
+  const address = 'https://store.steampowered.com/grandprix'
   const page = await browser.newPage()
 
   const checkResolvable = (path) => {
+    const urlArray = address.split('/')
+    const page = urlArray[urlArray.length - 1]
+
     const ext = Path.extname(path)
     const pathArray = path.split('/')
     const length = pathArray.length
@@ -39,7 +43,7 @@ const Path = require('path')
 
       // return 'base64'
       return false
-    } else if (pathArray[length - 1] == '') {
+    } else if (pathArray[length - 1] == '' || pathArray[length - 1] == page) {
       console.log('index')
 
       return 'index'
@@ -50,7 +54,8 @@ const Path = require('path')
     } else {
       console.log('Unknown file type')
 
-      return false
+      // return false
+      return true
     }
   }
 
@@ -68,12 +73,12 @@ const Path = require('path')
         if (resolvable == 'index') {
           out += 'index.html'
         }
-        if (resolvable == 'index' || resolvable.indexOf('html') >= 0) {
+        if (typeof resolvable == 'string' && (resolvable == 'index' || resolvable.indexOf('html') >= 0 || resolvable.indexOf('css') >= 0 || resolvable.indexOf('js') >= 0)) {
           const text = buffer.toString('utf8')
           const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}/g
-          const html = text.replace(regex, 'http://127.0.0.1:3000')
+          const replaced = text.replace(regex, 'http://127.0.0.1:3000')
 
-          fse.outputFile(out, html)
+          fse.outputFile(out, replaced)
         } else {
           fse.outputFile(out, buffer)
         }
@@ -81,7 +86,7 @@ const Path = require('path')
     }
   })
 
-  await page.goto('https://store.steampowered.com', {
+  await page.goto(address, {
     // waitUntil: 'load'
   })
 })()
