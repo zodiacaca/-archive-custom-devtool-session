@@ -68,10 +68,12 @@ const Path = require('path')
         if (resolvable == 'index') {
           out += 'index.html'
         }
-        if (resolvable.indexOf('html') >= 0) {
+        if (resolvable == 'index' || resolvable.indexOf('html') >= 0) {
           const text = buffer.toString('utf8')
+          const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}/g
+          const html = text.replace(regex, 'http://127.0.0.1')
 
-          fse.outputFile(out, text)
+          fse.outputFile(out, html)
         } else {
           fse.outputFile(out, buffer)
         }
@@ -79,7 +81,7 @@ const Path = require('path')
     }
   })
 
-  await page.goto('https://cn.bing.com', {
+  await page.goto('https://store.steampowered.com', {
     // waitUntil: 'load'
   })
 })()
