@@ -1,27 +1,14 @@
 
 const fs = require('fs')
 
-// const options = {
-//   persistent: true,
-//   recursive: true,
-//   encoding: 'utf8'
-// }
-// fs.watch('D:/DL/fdm', options, (eventType, filename) => {
-//   console.log(`event type is: ${eventType}`)
-//   if (filename) {
-//     console.log(`filename is: ${filename}`)
-//   } else {
-//     console.log('filename not provided')
-//   }
-// })
-
 const readConfig = require('./methods/readConfig')
 const config = readConfig(fs, __dirname + '/launch.json')
 
-const WebSocket = require('ws')
 const puppeteer = require('puppeteer')
 
-const deliverer = require('./classes/deliverer')
+const { URL } = require('url')
+const fse = require('fs-extra')
+const Path = require('path')
 
 ;(async () => {
   const launchOptions = {
@@ -35,63 +22,57 @@ const deliverer = require('./classes/deliverer')
     ]
   }
   const browser = await puppeteer.launch(launchOptions)
+  const page = await browser.newPage()
 
-  // Create a websocket to issue CDP commands.
-  const ws = new WebSocket(browser.wsEndpoint(), { perMessageDeflate: false })
-  await new Promise(resolve => ws.once('open', resolve))
-  console.log('WebSocket connected!')
+  const checkResolvable = (path) => {
+    const ext = Path.extname(path)
+    const pathArray = path.split('/')
+    const length = pathArray.length
+    // for (let i = 1; i < length; i++) {
+    //   if (pathArray[i].length > 128) {
+    //     return false
+    //   }
+    // }
 
+    if (path.indexOf(';base64') >= 0) {
+      console.log('Ignore raw data')
 
-  const Order = new deliverer.Order(ws, require('./classes/handler'))
+      // return 'base64'
+      return false
+    } else if (pathArray[length - 1] == '') {
+      console.log('index')
 
-  await Order.Send('Target.getTargets')
-  const pageInfo = (await Order.getLastResult()).targetInfos.find(info => info.type == 'page')
+      return 'index'
+    } else if (ext) {
+      console.log(ext)
 
-  await Order.Send('Target.attachToTarget',
-    {
-      targetId: pageInfo.targetId,
-      flatten: true,
-    },
-  )
-  Order.SessionID = (await Order.getLastResult()).sessionId
+      return ext
+    } else {
+      console.log('Unknown file type')
 
-  await Order.Send('Page.navigate',
-    {
-      url: 'https://cn.bing.com',
+      return false
     }
-  )
+  }
 
-  await Order.Send('DOM.enable')
+  page.on('response', (response) => {
+    const status = response.status()
+    if (status >= 300 && status <= 399) {
+      console.log('Ignore redirection to', response.headers().location)
+    } else {
+      const url = new URL(response.url())
+      const path = url.pathname
+      let out = '/tmp/static' + path
+      const resolvable = checkResolvable(path)
+      if (resolvable.indexOf('.') == 0) {
+        fse.outputFile(out, await response.buffer())
+      } else if (resolvable == 'index') {
+        out += 'index.html'
+        fse.outputFile(out, await response.buffer())
+      }
+    }
+  })
 
-  await Order.Send('CSS.enable')
-
-  await Order.Send('DOM.getDocument')
-  const rootId = (await Order.getLastResult()).root.nodeId
-
-  await Order.Send('DOM.querySelector',
-    {
-      nodeId: rootId,
-      selector: 'body',
-    },
-  )
-  const bodyId = (await Order.getLastResult()).nodeId
-
-  await Order.Send('CSS.getComputedStyleForNode',
-    {
-      nodeId: bodyId,
-    },
-  )
-  const styles = (await Order.getLastResult()).computedStyle
-  // for (let key in styles) {
-  //   console.log(styles[key])
-  // }
-
-  await Order.Send('Page.captureScreenshot')
-  const data = (await Order.getLastResult()).data
-  // fs.writeFile("./tmp/data.txt", data, function(err) {
-  //   err ? console.log(err) : console.log("File saved!")
-  // })
-  // fs.writeFile("./tmp/out.png", data, 'base64', function(err) {
-  //   err ? console.log(err) : console.log("Image saved!")
-  // })
+  await page.goto('https://cn.bing.com', {
+    // waitUntil: 'load'
+  })
 })()
