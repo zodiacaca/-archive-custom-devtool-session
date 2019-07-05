@@ -64,10 +64,17 @@ const Path = require('path')
       let out = './tmp/static' + path
       const resolvable = checkResolvable(path)
       if (resolvable) {
+        const buffer = await response.buffer()
         if (resolvable == 'index') {
           out += 'index.html'
         }
-        fse.outputFile(out, await response.buffer())
+        if (resolvable.indexOf('html') >= 0) {
+          const text = buffer.toString('utf8')
+
+          fse.outputFile(out, text)
+        } else {
+          fse.outputFile(out, buffer)
+        }
       }
     }
   })
