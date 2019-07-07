@@ -22,7 +22,7 @@ const Path = require('path')
     ]
   }
   const browser = await puppeteer.launch(launchOptions)
-  const address = 'https://store.steampowered.com/grandprix'
+  const address = 'https://thefwa.com/awards'
   const page = await browser.newPage()
 
   const checkResolvable = (path) => {
