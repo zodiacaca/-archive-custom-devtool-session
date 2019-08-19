@@ -29,8 +29,8 @@ module.exports = {
     constructor(ws, handler) {
       this.WebSocket = ws
       this.Handler = handler
-      this.results = []
       this.SessionID = undefined
+      this.results = []
       // retry relative
       this.rSuccessCount = 0
       this.rHistoryCount = 0
@@ -102,7 +102,7 @@ module.exports = {
     }
 
     printLastResult() {
-      let rst = this.results[this.rHistoryCount - 1]
+      const rst = this.results[this.rHistoryCount - 1]
       console.log('\x1b[35m', 'Result:', '\x1b[0m', rst)
     }
 
