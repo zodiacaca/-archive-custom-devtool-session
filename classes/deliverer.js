@@ -78,6 +78,21 @@ module.exports = {
       })
     }
 
+    Report(method, options = null) {
+      const domain = divideMethodString(method).domain
+      const command = divideMethodString(method).command
+      const id = getIncrementalId(domain)
+      this.Handler.sync(
+        this.WebSocket,
+        {
+          sessionId: this.SessionID,
+          id: id,
+          method: method,
+          params: options,
+        }
+      )
+    }
+
     async getLastResult() {
       let result = this.results[this.rHistoryCount - 1]
 

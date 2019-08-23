@@ -53,9 +53,14 @@ const deliverer = require('./classes/deliverer')
       flatten: true,
     },
   )
+  Order.SessionID = (await Order.getLastResult()).sessionId
 
   await Order.Send('Page.getFrameTree')
   const frameId = (await Order.getLastResult()).frameTree.frame.id
+
+  await Order.Send('Page.enable')
+
+  await Order.Report('Page.loadEventFired')
 
   await Order.Send('Page.navigate',
     {
@@ -63,8 +68,6 @@ const deliverer = require('./classes/deliverer')
       frameId: frameId,
     }
   )
-
-  await Order.Send('Page.enable')
 
   // await Order.Send('DOM.enable')
 
