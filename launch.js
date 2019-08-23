@@ -53,45 +53,50 @@ const deliverer = require('./classes/deliverer')
       flatten: true,
     },
   )
-  Order.SessionID = (await Order.getLastResult()).sessionId
+
+  await Order.Send('Page.getFrameTree')
+  const frameId = (await Order.getLastResult()).frameTree.frame.id
 
   await Order.Send('Page.navigate',
     {
       url: 'https://cn.bing.com',
+      frameId: frameId,
     }
   )
 
-  await Order.Send('DOM.enable')
+  await Order.Send('Page.enable')
 
-  await Order.Send('CSS.enable')
+  // await Order.Send('DOM.enable')
 
-  await Order.Send('DOM.getDocument')
-  const rootId = (await Order.getLastResult()).root.nodeId
+  // await Order.Send('CSS.enable')
 
-  await Order.Send('DOM.querySelector',
-    {
-      nodeId: rootId,
-      selector: 'body',
-    },
-  )
-  const bodyId = (await Order.getLastResult()).nodeId
+  // await Order.Send('DOM.getDocument')
+  // const rootId = (await Order.getLastResult()).root.nodeId
 
-  await Order.Send('CSS.getComputedStyleForNode',
-    {
-      nodeId: bodyId,
-    },
-  )
-  const styles = (await Order.getLastResult()).computedStyle
-  // for (let key in styles) {
-  //   console.log(styles[key])
-  // }
+  // await Order.Send('DOM.querySelector',
+  //   {
+  //     nodeId: rootId,
+  //     selector: 'body',
+  //   },
+  // )
+  // const bodyId = (await Order.getLastResult()).nodeId
 
-  await Order.Send('Page.captureScreenshot')
-  const data = (await Order.getLastResult()).data
-  // fs.writeFile("./tmp/data.txt", data, function(err) {
-  //   err ? console.log(err) : console.log("File saved!")
-  // })
-  // fs.writeFile("./tmp/out.png", data, 'base64', function(err) {
-  //   err ? console.log(err) : console.log("Image saved!")
-  // })
+  // await Order.Send('CSS.getComputedStyleForNode',
+  //   {
+  //     nodeId: bodyId,
+  //   },
+  // )
+  // const styles = (await Order.getLastResult()).computedStyle
+  // // for (let key in styles) {
+  // //   console.log(styles[key])
+  // // }
+
+  // await Order.Send('Page.captureScreenshot')
+  // const data = (await Order.getLastResult()).data
+  // // fs.writeFile("./tmp/data.txt", data, function(err) {
+  // //   err ? console.log(err) : console.log("File saved!")
+  // // })
+  // // fs.writeFile("./tmp/out.png", data, 'base64', function(err) {
+  // //   err ? console.log(err) : console.log("Image saved!")
+  // // })
 })()
