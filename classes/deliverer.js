@@ -93,6 +93,14 @@ module.exports = {
       )
     }
 
+    Idle(time) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve()
+        }, time)
+      })
+    }
+
     async getLastResult() {
       let result = this.results[this.rHistoryCount - 1]
 
