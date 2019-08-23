@@ -60,7 +60,7 @@ const deliverer = require('./classes/deliverer')
 
   await Order.Send('Page.enable')
 
-  await Order.Report('Page.loadEventFired')
+  Order.Report('Page.loadEventFired', 1)
 
   await Order.Send('Page.navigate',
     {

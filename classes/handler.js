@@ -13,15 +13,20 @@ module.exports = {
       })
     })
   },
-  sync: function(ws, command) {
+  sync: function(ws, command, dispatch) {
+    dispatch -= 1
+    const self = arguments.callee
     ws.on('message', function(text) {
       const response = JSON.parse(text)
       if (response.method === command.method) {
         console.log(response)
+        ws.removeListener('message', arguments.callee)
+        if (dispatch > 0) {
+          self(ws, command, dispatch)
+        } else if (dispatch < 0) {
+          self(ws, command, 0)
+        }
       }
-      // if (response.id === command.id) {
-      //   ws.removeListener('message', arguments.callee)
-      // }
     })
   }
 }
