@@ -42,7 +42,7 @@ const deliverer = require('./classes/deliverer')
   console.log('WebSocket connected!')
 
 
-  const Order = new deliverer.Order(ws, require('./classes/handler'))
+  const Order = new deliverer.Order(ws)
 
   await Order.Send('Target.getTargets')
   const pageInfo = (await Order.getLastResult()).targetInfos.find(info => info.type == 'page')
@@ -60,14 +60,14 @@ const deliverer = require('./classes/deliverer')
 
   await Order.Send('Page.enable')
 
-  Order.Report('Page.loadEventFired', 1)
+  // Order.Report('Page.loadEventFired', 1)
 
-  await Order.Send('Page.navigate',
-    {
-      url: 'https://cn.bing.com',
-      frameId: frameId,
-    }
-  )
+  // await Order.Send('Page.navigate',
+  //   {
+  //     url: 'https://cn.bing.com',
+  //     frameId: frameId,
+  //   }
+  // )
 
   // await Order.Send('DOM.enable')
 
