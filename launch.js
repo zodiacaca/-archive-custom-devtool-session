@@ -19,9 +19,9 @@ const readConfig = require('./methods/readConfig')
 const config = readConfig(fs, __dirname + '/launch.json')
 
 const WebSocket = require('ws')
-const puppeteer = require('puppeteer')
+const Puppeteer = require('puppeteer')
 
-const deliverer = require('./classes/deliverer')
+const Bar = require('./classes/bar')
 
 ;(async () => {
   const launchOptions = {
@@ -34,7 +34,7 @@ const deliverer = require('./classes/deliverer')
       '--lang=en-US,en',
     ]
   }
-  const browser = await puppeteer.launch(launchOptions)
+  const browser = await Puppeteer.launch(launchOptions)
 
   // Create a websocket to issue CDP commands.
   const ws = new WebSocket(browser.wsEndpoint(), { perMessageDeflate: false })
@@ -42,60 +42,60 @@ const deliverer = require('./classes/deliverer')
   console.log('WebSocket connected!')
 
 
-  const Order = new deliverer.Order(ws)
+  const Customer = new Bar.Bartender(ws)
 
-  await Order.Send('Target.getTargets')
-  const pageInfo = (await Order.getLastResult()).targetInfos.find(info => info.type == 'page')
+  await Customer.Order('Target.getTargets')
+  const pageInfo = (await Customer.getLastResult()).targetInfos.find(info => info.type == 'page')
 
-  await Order.Send('Target.attachToTarget',
+  await Customer.Order('Target.attachToTarget',
     {
       targetId: pageInfo.targetId,
       flatten: true,
     },
   )
-  Order.SessionID = (await Order.getLastResult()).sessionId
+  Customer.SessionID = (await Customer.getLastResult()).sessionId
 
-  await Order.Send('Page.getFrameTree')
-  const frameId = (await Order.getLastResult()).frameTree.frame.id
+  await Customer.Order('Page.getFrameTree')
+  const frameId = (await Customer.getLastResult()).frameTree.frame.id
 
-  await Order.Send('Page.enable')
+  await Customer.Order('Page.enable')
 
-  // Order.Report('Page.loadEventFired', 1)
+  // Customer.Report('Page.loadEventFired', 1)
 
-  // await Order.Send('Page.navigate',
+  // await Customer.Order('Page.navigate',
   //   {
   //     url: 'https://cn.bing.com',
   //     frameId: frameId,
   //   }
   // )
 
-  // await Order.Send('DOM.enable')
+  // await Customer.Order('DOM.enable')
 
-  // await Order.Send('CSS.enable')
+  // await Customer.Order('CSS.enable')
 
-  // await Order.Send('DOM.getDocument')
-  // const rootId = (await Order.getLastResult()).root.nodeId
+  // await Customer.Order('DOM.getDocument')
+  // const rootId = (await Customer.getLastResult()).root.nodeId
 
-  // await Order.Send('DOM.querySelector',
+  // await Customer.Order('DOM.querySelector',
   //   {
   //     nodeId: rootId,
   //     selector: 'body',
   //   },
   // )
-  // const bodyId = (await Order.getLastResult()).nodeId
+  // const bodyId = (await Customer.getLastResult()).nodeId
 
-  // await Order.Send('CSS.getComputedStyleForNode',
+  // await Customer.Order('CSS.getComputedStyleForNode',
   //   {
   //     nodeId: bodyId,
   //   },
   // )
-  // const styles = (await Order.getLastResult()).computedStyle
+  // const styles = (await Customer.getLastResult()).computedStyle
   // // for (let key in styles) {
   // //   console.log(styles[key])
   // // }
 
-  // await Order.Send('Page.captureScreenshot')
-  // const data = (await Order.getLastResult()).data
+  // await Customer.Order('Page.captureScreenshot')
+  // const data = (await Customer.getLastResult()).data
   // // fs.writeFile("./tmp/data.txt", data, function(err) {
   // //   err ? console.log(err) : console.log("File saved!")
   // // })

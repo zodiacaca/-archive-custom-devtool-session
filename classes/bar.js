@@ -15,7 +15,7 @@ const stampResult = (rst, stp) => {
 }
 
 module.exports = {
-  Order: class {
+  Bartender: class {
     constructor(ws) {
       this.WebSocket = ws
       this.SessionID = undefined
@@ -28,7 +28,7 @@ module.exports = {
       this.rMaximumNumberOfAttempts = 5
     }
 
-    async Send(method, options = null, retry = false) {
+    async Order(method, options = null, retry = false) {
       const cmd = divideMethodString(method)
       this.addDomain(cmd.domain)
       const response = await this[cmd.domain].Accept(method, options)
