@@ -1,5 +1,5 @@
 
-const Cocktail = require('./classes/cocktail')
+const Catagory = require('./classes/catagory')
 
 const divideMethodString = (method) => {
   const index = method.indexOf('.')
@@ -59,7 +59,7 @@ module.exports = {
       })
     }
 
-    Report(method, dispatch = 0) {
+    Wonder(method, dispatch = 0) {
       this.Handler.sync(
         this.WebSocket,
         {
@@ -78,7 +78,7 @@ module.exports = {
       })
     }
 
-    async getLastResult() {
+    async getReceipt() {
       let result = this.results[this.rHistoryCount - 1]
 
       if (!result) {
@@ -118,7 +118,7 @@ module.exports = {
 
     addDomain(dmn) {
       if (!this.domains.includes(dmn)) {
-        this[dmn] = new Cocktail(dmn, this.WebSocket, this.SessionID, this.domains.length)
+        this[dmn] = new Catagory(dmn, this.WebSocket, this.SessionID, this.domains.length)
         this.domains.push(dmn)
       }
     }

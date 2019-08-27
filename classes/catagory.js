@@ -4,12 +4,11 @@ module.exports = class {
     this.Domain = dmn
     this.WebSocket = ws
     this.SessionID = sID
-    this.Shaker = require('./handler')
     this.currentID = 10000 * ++len
   }
 
   async Accept(method, options) {
-    const response = await this.Shaker.mix(
+    const response = await mix(
       this.WebSocket,
       {
         sessionId: this.SessionID,

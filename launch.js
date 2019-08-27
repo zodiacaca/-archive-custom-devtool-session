@@ -45,7 +45,7 @@ const Bar = require('./classes/bar')
   const Customer = new Bar.Bartender(ws)
 
   await Customer.Order('Target.getTargets')
-  const pageInfo = (await Customer.getLastResult()).targetInfos.find(info => info.type == 'page')
+  const pageInfo = (await Customer.getReceipt()).targetInfos.find(info => info.type == 'page')
 
   await Customer.Order('Target.attachToTarget',
     {
@@ -53,14 +53,14 @@ const Bar = require('./classes/bar')
       flatten: true,
     },
   )
-  Customer.SessionID = (await Customer.getLastResult()).sessionId
+  Customer.SessionID = (await Customer.getReceipt()).sessionId
 
   await Customer.Order('Page.getFrameTree')
-  const frameId = (await Customer.getLastResult()).frameTree.frame.id
+  const frameId = (await Customer.getReceipt()).frameTree.frame.id
 
   await Customer.Order('Page.enable')
 
-  // Customer.Report('Page.loadEventFired', 1)
+  // Customer.Wonder('Page.loadEventFired')
 
   // await Customer.Order('Page.navigate',
   //   {
@@ -69,12 +69,14 @@ const Bar = require('./classes/bar')
   //   }
   // )
 
+  // await Customer.Check('Page.loadEventFired')
+
   // await Customer.Order('DOM.enable')
 
   // await Customer.Order('CSS.enable')
 
   // await Customer.Order('DOM.getDocument')
-  // const rootId = (await Customer.getLastResult()).root.nodeId
+  // const rootId = (await Customer.getReceipt()).root.nodeId
 
   // await Customer.Order('DOM.querySelector',
   //   {
@@ -82,20 +84,20 @@ const Bar = require('./classes/bar')
   //     selector: 'body',
   //   },
   // )
-  // const bodyId = (await Customer.getLastResult()).nodeId
+  // const bodyId = (await Customer.getReceipt()).nodeId
 
   // await Customer.Order('CSS.getComputedStyleForNode',
   //   {
   //     nodeId: bodyId,
   //   },
   // )
-  // const styles = (await Customer.getLastResult()).computedStyle
+  // const styles = (await Customer.getReceipt()).computedStyle
   // // for (let key in styles) {
   // //   console.log(styles[key])
   // // }
 
   // await Customer.Order('Page.captureScreenshot')
-  // const data = (await Customer.getLastResult()).data
+  // const data = (await Customer.getReceipt()).data
   // // fs.writeFile("./tmp/data.txt", data, function(err) {
   // //   err ? console.log(err) : console.log("File saved!")
   // // })
