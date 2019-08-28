@@ -22,7 +22,9 @@ module.exports = class {
 }
 
 const _Accept = (ws, command, count) => {
-  count--
+  if (count) {
+    count--
+  }
   const self = arguments.callee
 
   ws.on('message', function(text) {
@@ -30,9 +32,9 @@ const _Accept = (ws, command, count) => {
     if (response.method === command.method) {
       console.log(response)
       ws.removeListener('message', arguments.callee)
-      if (dispatch > 0) {
-        self(ws, command, dispatch)
-      } else if (dispatch < 0) {
+      if (count && count > 0) {
+        self(ws, command, count)
+      } else if (count && count < 0) {
         self(ws, command, 0)
       }
     }

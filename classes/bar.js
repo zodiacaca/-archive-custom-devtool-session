@@ -61,7 +61,7 @@ module.exports = {
     }
 
     Wonder(method, count = null) {
-
+      Event.Accept(method, count)
     }
 
     static Idle(time) {
