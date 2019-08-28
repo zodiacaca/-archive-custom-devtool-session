@@ -5,8 +5,8 @@ module.exports = class {
     this.SessionID = sID
   }
 
-  async Accept(method, count) {
-    const response = await _Accept(
+  Accept(method, count) {
+    _Accept(
       this.WebSocket,
       {
         sessionId: this.SessionID,
@@ -14,18 +14,14 @@ module.exports = class {
       },
       count,
     )
-
-    return new Promise(resolve => {
-      resolve(response)
-    })
   }
 }
 
 const _Accept = (ws, command, count) => {
+  const self = arguments.callee
   if (count) {
     count--
   }
-  const self = arguments.callee
 
   ws.on('message', function(text) {
     const response = JSON.parse(text)

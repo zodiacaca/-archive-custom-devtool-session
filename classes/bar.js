@@ -1,6 +1,6 @@
 
-const Catagory = require('./classes/catagory')
-const Event = require('./classes/event')
+const Catagory = require('./catagory')
+const Event = require('./event')
 
 const divideMethodString = (method) => {
   const index = method.indexOf('.')
@@ -29,6 +29,12 @@ module.exports = {
       this.rHistoryCount = 0
       this.rLastOrder = undefined
       this.rMaximumNumberOfAttempts = 5
+
+      this.init()
+    }
+
+    init() {
+      this.EventListener = new Event(this.WebSocket, this.SessionID)
     }
 
     async Order(method, options = null, retry = false) {
@@ -61,7 +67,7 @@ module.exports = {
     }
 
     Wonder(method, count = null) {
-      Event.Accept(method, count)
+      this.EventListener.Accept(method, count)
     }
 
     static Idle(time) {

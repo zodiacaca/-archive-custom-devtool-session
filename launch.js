@@ -60,14 +60,14 @@ const Bar = require('./classes/bar')
 
   await Customer.Order('Page.enable')
 
-  // Customer.Wonder('Page.loadEventFired')
+  Customer.Wonder('Page.loadEventFired')
 
-  // await Customer.Order('Page.navigate',
-  //   {
-  //     url: 'https://cn.bing.com',
-  //     frameId: frameId,
-  //   }
-  // )
+  await Customer.Order('Page.navigate',
+    {
+      url: 'https://cn.bing.com',
+      frameId: frameId,
+    }
+  )
 
   // await Customer.Check('Page.loadEventFired')
 
