@@ -17,7 +17,7 @@ module.exports = class {
   }
 }
 
-const _Accept = (ws, command, count) => {
+const _Accept = function(ws, command, count) {
   const self = arguments.callee
   if (count) {
     count--

@@ -24,7 +24,7 @@ module.exports = class {
   }
 }
 
-const _Accept = (ws, command) => {
+const _Accept = function(ws, command) {
   ws.send(JSON.stringify(command))
 
   return new Promise(resolve => {
