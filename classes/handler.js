@@ -14,7 +14,7 @@ module.exports = {
     })
   },
   sync: function(ws, command, dispatch) {
-    dispatch -= 1
+    dispatch--
     const self = arguments.callee
     ws.on('message', function(text) {
       const response = JSON.parse(text)

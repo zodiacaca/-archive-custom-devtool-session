@@ -45,7 +45,7 @@ const Bar = require('./classes/bar')
   const Customer = new Bar.Bartender(ws)
 
   await Customer.Order('Target.getTargets')
-  const pageInfo = (await Customer.getReceipt()).targetInfos.find(info => info.type == 'page')
+  const pageInfo = (await Customer.GetReceipt()).targetInfos.find(info => info.type == 'page')
 
   await Customer.Order('Target.attachToTarget',
     {
@@ -53,10 +53,10 @@ const Bar = require('./classes/bar')
       flatten: true,
     },
   )
-  Customer.SessionID = (await Customer.getReceipt()).sessionId
+  Customer.SessionID = (await Customer.GetReceipt()).sessionId
 
   await Customer.Order('Page.getFrameTree')
-  const frameId = (await Customer.getReceipt()).frameTree.frame.id
+  const frameId = (await Customer.GetReceipt()).frameTree.frame.id
 
   await Customer.Order('Page.enable')
 
@@ -76,7 +76,7 @@ const Bar = require('./classes/bar')
   // await Customer.Order('CSS.enable')
 
   // await Customer.Order('DOM.getDocument')
-  // const rootId = (await Customer.getReceipt()).root.nodeId
+  // const rootId = (await Customer.GetReceipt()).root.nodeId
 
   // await Customer.Order('DOM.querySelector',
   //   {
@@ -84,20 +84,20 @@ const Bar = require('./classes/bar')
   //     selector: 'body',
   //   },
   // )
-  // const bodyId = (await Customer.getReceipt()).nodeId
+  // const bodyId = (await Customer.GetReceipt()).nodeId
 
   // await Customer.Order('CSS.getComputedStyleForNode',
   //   {
   //     nodeId: bodyId,
   //   },
   // )
-  // const styles = (await Customer.getReceipt()).computedStyle
+  // const styles = (await Customer.GetReceipt()).computedStyle
   // // for (let key in styles) {
   // //   console.log(styles[key])
   // // }
 
   // await Customer.Order('Page.captureScreenshot')
-  // const data = (await Customer.getReceipt()).data
+  // const data = (await Customer.GetReceipt()).data
   // // fs.writeFile("./tmp/data.txt", data, function(err) {
   // //   err ? console.log(err) : console.log("File saved!")
   // // })

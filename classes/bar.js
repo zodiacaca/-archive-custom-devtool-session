@@ -32,8 +32,8 @@ module.exports = {
 
     async Order(method, options = null, retry = false) {
       const cmd = divideMethodString(method)
-      this.addDomain(cmd.domain)
-      const response = await this[cmd.domain].Accept(method, options)
+      const Catagory = this.addDomain(cmd.domain)
+      const response = await Catagory.Accept(method, options)
       return new Promise(resolve => {
         if (!response.code && response.result) {
           const stamp = {
@@ -59,15 +59,8 @@ module.exports = {
       })
     }
 
-    Wonder(method, dispatch = 0) {
-      this.Handler.sync(
-        this.WebSocket,
-        {
-          sessionId: this.SessionID,
-          method: method,
-        },
-        dispatch,
-      )
+    Wonder(method, count = null) {
+
     }
 
     static Idle(time) {
@@ -78,7 +71,7 @@ module.exports = {
       })
     }
 
-    async getReceipt() {
+    async GetReceipt() {
       let result = this.results[this.rHistoryCount - 1]
 
       if (!result) {
@@ -101,7 +94,7 @@ module.exports = {
       }
     }
 
-    printLastResult() {
+    PrintReceipt() {
       const rst = this.results[this.rHistoryCount - 1]
       console.log('\x1b[35m', 'Result:', '\x1b[0m', rst)
     }
@@ -110,7 +103,7 @@ module.exports = {
 
       return new Promise(resolve => {
         setTimeout(async () => {
-          const response = await this.Send(this.rLastOrder.m, this.rLastOrder.o, true)
+          const response = await this.Order(this.rLastOrder.m, this.rLastOrder.o, true)
           resolve(response)
         }, 500)
       })
@@ -121,6 +114,8 @@ module.exports = {
         this[dmn] = new Catagory(dmn, this.WebSocket, this.SessionID, this.domains.length)
         this.domains.push(dmn)
       }
+
+      return this[dmn]
     }
   },
 }
