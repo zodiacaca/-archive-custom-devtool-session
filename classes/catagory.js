@@ -8,7 +8,7 @@ module.exports = class {
   }
 
   async Accept(method, options) {
-    const response = await mix(
+    const response = await _Accept(
       this.WebSocket,
       {
         sessionId: this.SessionID,
@@ -24,7 +24,7 @@ module.exports = class {
   }
 }
 
-const mix = (ws, command) => {
+const _Accept = (ws, command) => {
   ws.send(JSON.stringify(command))
 
   return new Promise(resolve => {

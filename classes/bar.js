@@ -1,5 +1,6 @@
 
 const Catagory = require('./classes/catagory')
+const Event = require('./classes/event')
 
 const divideMethodString = (method) => {
   const index = method.indexOf('.')
