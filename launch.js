@@ -76,26 +76,28 @@ const Bar = require('./classes/bar')
 
   await Customer.Order('CSS.enable')
 
-  // await Customer.Order('DOM.getDocument')
-  // const rootId = (await Customer.GetReceipt()).root.nodeId
+  await Customer.Order('DOM.getDocument')
+  const rootId = (await Customer.GetReceipt()).root.nodeId
+  // console.log('rootId:', rootId)
 
-  // await Customer.Order('DOM.querySelector',
-  //   {
-  //     nodeId: rootId,
-  //     selector: 'body',
-  //   },
-  // )
-  // const bodyId = (await Customer.GetReceipt()).nodeId
+  await Customer.Order('DOM.querySelector',
+    {
+      nodeId: rootId,
+      selector: 'body',
+    },
+  )
+  const bodyId = (await Customer.GetReceipt()).nodeId
+  // console.log('bodyId:', bodyId)
 
-  // await Customer.Order('CSS.getComputedStyleForNode',
-  //   {
-  //     nodeId: bodyId,
-  //   },
-  // )
-  // const styles = (await Customer.GetReceipt()).computedStyle
-  // // for (let key in styles) {
-  // //   console.log(styles[key])
-  // // }
+  await Customer.Order('CSS.getComputedStyleForNode',
+    {
+      nodeId: bodyId,
+    },
+  )
+  const styles = (await Customer.GetReceipt()).computedStyle
+  for (let key in styles) {
+    console.log(styles[key])
+  }
 
   // await Customer.Order('Page.captureScreenshot')
   // const data = (await Customer.GetReceipt()).data

@@ -82,18 +82,21 @@ module.exports = {
     }
 
     Check(method) {
-      for (let i = this.events.length - 1; i >= 0; i--) {
-        if (this.events[i].method == method) {
-          const idx = subscriptions.slice().reverse().indexOf(method)
-          if (idx >= 0) {
-            subscriptions.splice(idx, 1)
+      return new Promise(resolve => {
+        const timer = setInterval(() => {
+          for (let i = this.events.length - 1; i >= 0; i--) {
+            if (this.events[i].method == method) {
+              const idx = this.subscriptions.slice().reverse().indexOf(method)
+              if (idx >= 0) {
+                this.subscriptions.splice(idx, 1)
 
-            return new Promise(resolve => {
-              resolve(events[i].params.timestamp)
-            })
+                clearInterval(timer)
+                resolve(this.events[i].params.timestamp)
+              }
+            }
           }
-        }
-      }
+        }, 50)
+      })
     }
 
     static Idle(time) {
