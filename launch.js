@@ -70,11 +70,11 @@ const Bar = require('./classes/bar')
     }
   )
 
-  // await Customer.Check('Page.loadEventFired')
+  await Customer.Check('Page.loadEventFired')
 
-  // await Customer.Order('DOM.enable')
+  await Customer.Order('DOM.enable')
 
-  // await Customer.Order('CSS.enable')
+  await Customer.Order('CSS.enable')
 
   // await Customer.Order('DOM.getDocument')
   // const rootId = (await Customer.GetReceipt()).root.nodeId

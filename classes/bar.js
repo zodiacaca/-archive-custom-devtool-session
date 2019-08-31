@@ -1,6 +1,5 @@
 
 const Catagory = require('./catagory')
-const Event = require('./event')
 
 const divideMethodString = (method) => {
   const index = method.indexOf('.')
@@ -25,6 +24,7 @@ module.exports = {
       this.domains = []
       this.results = []
       this.events = []
+      this.subscriptions = []
       // retry relative
       this.rSuccessCount = 0
       this.rHistoryCount = 0
@@ -39,10 +39,12 @@ module.exports = {
     }
 
     createEventListener() {
-      this.WebSocket.on('message', function(text) {
+      this.WebSocket.on('message', (text) => {
         const event = JSON.parse(text)
-        this.events.push(event)
-        console.log(event)
+        if (this.subscriptions.includes(event.method)) {
+          this.events.push(event)
+          console.log(event)
+        }
       })
     }
 
@@ -75,8 +77,23 @@ module.exports = {
       })
     }
 
-    Wonder(method, count = null) {
-      this.EventListener.Accept(method, count)
+    Wonder(method) {
+      this.subscriptions.push(method)
+    }
+
+    Check(method) {
+      for (let i = this.events.length - 1; i >= 0; i--) {
+        if (this.events[i].method == method) {
+          const idx = subscriptions.slice().reverse().indexOf(method)
+          if (idx >= 0) {
+            subscriptions.splice(idx, 1)
+
+            return new Promise(resolve => {
+              resolve(events[i].params.timestamp)
+            })
+          }
+        }
+      }
     }
 
     static Idle(time) {
