@@ -24,6 +24,7 @@ module.exports = {
       this.SessionID = undefined
       this.domains = []
       this.results = []
+      this.events = []
       // retry relative
       this.rSuccessCount = 0
       this.rHistoryCount = 0
@@ -34,7 +35,15 @@ module.exports = {
     }
 
     init() {
-      this.EventListener = new Event(this.WebSocket, this.SessionID)
+
+    }
+
+    createEventListener() {
+      this.WebSocket.on('message', function(text) {
+        const event = JSON.parse(text)
+        this.events.push(event)
+        console.log(event)
+      })
     }
 
     async Order(method, options = null, retry = false) {

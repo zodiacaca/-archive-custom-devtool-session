@@ -54,6 +54,7 @@ const Bar = require('./classes/bar')
     },
   )
   Customer.SessionID = (await Customer.GetReceipt()).sessionId
+  Customer.createEventListener()
 
   await Customer.Order('Page.getFrameTree')
   const frameId = (await Customer.GetReceipt()).frameTree.frame.id
