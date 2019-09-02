@@ -102,6 +102,8 @@ const Bar = require('./classes/bar')
   await Customer.Order('DOM.getFlattenedDocument')
   Customer.PrintReceipt()
 
+  await Bar.Bartender.Idle(1500)
+
   // await Customer.Order('Page.captureScreenshot')
   // const data = (await Customer.GetReceipt()).data
   // // fs.writeFile("./tmp/data.txt", data, function(err) {
