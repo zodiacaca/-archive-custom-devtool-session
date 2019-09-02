@@ -65,12 +65,14 @@ const Bar = require('./classes/bar')
 
   await Customer.Order('Page.navigate',
     {
-      url: 'https://cn.bing.com',
+      url: 'https://store.steampowered.com',
       frameId: frameId,
     }
   )
 
   await Customer.Check('Page.loadEventFired')
+
+  Customer.Wonder('Page.loadEventFired')
 
   await Customer.Order('DOM.enable')
 
@@ -89,20 +91,30 @@ const Bar = require('./classes/bar')
   const bodyId = (await Customer.GetReceipt()).nodeId
   // console.log('bodyId:', bodyId)
 
-  await Customer.Order('CSS.getComputedStyleForNode',
+  // await Customer.Order('CSS.getComputedStyleForNode',
+  //   {
+  //     nodeId: bodyId,
+  //   },
+  // )
+  // const styles = (await Customer.GetReceipt()).computedStyle
+  // // for (let key in styles) {
+  // //   console.log(styles[key])
+  // // }
+
+  // await Customer.Order('DOM.getFlattenedDocument')
+  // Customer.PrintReceipt()
+
+  await Bar.Bartender.Idle(5000)
+
+  await Customer.Order('Page.reload',
     {
-      nodeId: bodyId,
+      ignoreCache: true,
     },
   )
-  const styles = (await Customer.GetReceipt()).computedStyle
-  // for (let key in styles) {
-  //   console.log(styles[key])
-  // }
 
-  await Customer.Order('DOM.getFlattenedDocument')
-  Customer.PrintReceipt()
+  await Customer.Check('Page.loadEventFired')
 
-  await Bar.Bartender.Idle(1500)
+  await Bar.Bartender.Idle(5000)
 
   // await Customer.Order('Page.captureScreenshot')
   // const data = (await Customer.GetReceipt()).data

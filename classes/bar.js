@@ -85,12 +85,13 @@ module.exports = {
       return new Promise(resolve => {
         const timer = setInterval(() => {
           for (let i = this.events.length - 1; i >= 0; i--) {
-            if (this.events[i].method == method) {
+            if (this.events[i].method == method && !this.events[i].checked) {
               const idx = this.subscriptions.slice().reverse().indexOf(method)
               if (idx >= 0) {
                 this.subscriptions.splice(idx, 1)
 
                 clearInterval(timer)
+                this.events[i].checked = true
                 resolve(this.events[i].params.timestamp)
               }
             }
