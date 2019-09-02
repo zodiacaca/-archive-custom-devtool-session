@@ -95,9 +95,12 @@ const Bar = require('./classes/bar')
     },
   )
   const styles = (await Customer.GetReceipt()).computedStyle
-  for (let key in styles) {
-    console.log(styles[key])
-  }
+  // for (let key in styles) {
+  //   console.log(styles[key])
+  // }
+
+  await Customer.Order('DOM.getFlattenedDocument')
+  Customer.PrintReceipt()
 
   // await Customer.Order('Page.captureScreenshot')
   // const data = (await Customer.GetReceipt()).data
