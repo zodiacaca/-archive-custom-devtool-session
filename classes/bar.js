@@ -101,7 +101,9 @@ module.exports = {
 
     static Idle(time) {
       return new Promise(resolve => {
+        console.log(`[Idling...`)
         setTimeout(() => {
+          console.log(`...${time} milliseconds passed.]`)
           resolve()
         }, time)
       })
