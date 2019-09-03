@@ -41,7 +41,9 @@ const Bar = require('./classes/bar')
   await new Promise(resolve => ws.once('open', resolve))
   console.log('WebSocket connected!')
 
-
+  /* ------------------------------
+    after WebSocket connected
+  ------------------------------ */
   const Customer = new Bar.Bartender(ws)
 
   await Customer.Order('Target.getTargets')
@@ -54,8 +56,10 @@ const Bar = require('./classes/bar')
     },
   )
   Customer.SessionID = (await Customer.GetReceipt()).sessionId
-  Customer.createEventListener()
 
+  /* ------------------------------
+    after Customer got SessionID
+  ------------------------------ */
   await Customer.Order('Page.getFrameTree')
   const frameId = (await Customer.GetReceipt()).frameTree.frame.id
 

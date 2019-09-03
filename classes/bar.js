@@ -35,7 +35,7 @@ module.exports = {
     }
 
     init() {
-
+      this.createEventListener()
     }
 
     createEventListener() {
@@ -83,8 +83,9 @@ module.exports = {
 
     Check(method) {
       return new Promise(resolve => {
+        let count = 0
         const timer = setInterval(() => {
-          for (let i = this.events.length - 1; i >= 0; i--) {
+          for (let i = this.events.length - 1; i >= count; i--) {
             if (this.events[i].method == method && !this.events[i].checked) {
               const idx = this.subscriptions.slice().reverse().indexOf(method)
               if (idx >= 0) {
@@ -92,10 +93,13 @@ module.exports = {
 
                 clearInterval(timer)
                 this.events[i].checked = true
+                this.clearOldEvents(method)
                 resolve(this.events[i].params.timestamp)
+                break
               }
             }
           }
+          count = this.events.length
         }, 50)
       })
     }
@@ -155,6 +159,14 @@ module.exports = {
       }
 
       return this[dmn]
+    }
+
+    clearOldEvents(method) {
+      for (let i = this.events.length - 1; i >= 0; i--) {
+        if (this.events[i].method == method && !this.events[i].checked) {
+          this.events[i].checked = true
+        }
+      }
     }
   },
 }
