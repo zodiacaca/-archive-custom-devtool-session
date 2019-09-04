@@ -69,7 +69,8 @@ const Bar = require('./classes/bar')
 
   await Customer.Order('Page.navigate',
     {
-      url: 'https://store.steampowered.com',
+      url: 'https://cn.bing.com',
+      // url: 'https://store.steampowered.com',
       frameId: frameId,
     }
   )
@@ -108,7 +109,7 @@ const Bar = require('./classes/bar')
   // await Customer.Order('DOM.getFlattenedDocument')
   // Customer.PrintReceipt()
 
-  await Bar.Bartender.Idle(5000)
+  await Bar.Bartender.Idle(2000)
 
   await Customer.Order('Page.reload',
     {
@@ -118,7 +119,7 @@ const Bar = require('./classes/bar')
 
   await Customer.Check('Page.loadEventFired')
 
-  await Bar.Bartender.Idle(5000)
+  await Bar.Bartender.Idle(2000)
 
   // await Customer.Order('Page.captureScreenshot')
   // const data = (await Customer.GetReceipt()).data
