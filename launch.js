@@ -79,22 +79,25 @@ const Bar = require('./classes/bar')
 
   Customer.Wonder('Page.loadEventFired')
 
-  await Customer.Order('DOM.enable')
+  const path = 'D:/DL/design/source/PageStackNavigation/index.html'
+  const html = await fs.promises.readFile(path, { encoding: 'utf8' })
 
-  await Customer.Order('CSS.enable')
+  // await Customer.Order('DOM.enable')
 
-  await Customer.Order('DOM.getDocument')
-  const rootId = (await Customer.GetReceipt()).root.nodeId
-  // console.log('rootId:', rootId)
+  // await Customer.Order('CSS.enable')
 
-  await Customer.Order('DOM.querySelector',
-    {
-      nodeId: rootId,
-      selector: 'body',
-    },
-  )
-  const bodyId = (await Customer.GetReceipt()).nodeId
-  // console.log('bodyId:', bodyId)
+  // await Customer.Order('DOM.getDocument')
+  // const rootId = (await Customer.GetReceipt()).root.nodeId
+  // // console.log('rootId:', rootId)
+
+  // await Customer.Order('DOM.querySelector',
+  //   {
+  //     nodeId: rootId,
+  //     selector: 'body',
+  //   },
+  // )
+  // const bodyId = (await Customer.GetReceipt()).nodeId
+  // // console.log('bodyId:', bodyId)
 
   // await Customer.Order('CSS.getComputedStyleForNode',
   //   {
@@ -111,15 +114,22 @@ const Bar = require('./classes/bar')
 
   await Bar.Bartender.Idle(2000)
 
-  await Customer.Order('Page.reload',
+  await Customer.Order('Page.setDocumentContent',
     {
-      ignoreCache: true,
-    },
+      frameId: frameId,
+      html: html,
+    }
   )
 
-  await Customer.Check('Page.loadEventFired')
+  // await Customer.Order('Page.reload',
+  //   {
+  //     ignoreCache: true,
+  //   },
+  // )
 
-  await Bar.Bartender.Idle(2000)
+  // await Customer.Check('Page.loadEventFired')
+
+  // await Bar.Bartender.Idle(2000)
 
   // await Customer.Order('Page.captureScreenshot')
   // const data = (await Customer.GetReceipt()).data

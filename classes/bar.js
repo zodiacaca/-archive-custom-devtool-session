@@ -35,6 +35,7 @@ module.exports = {
     }
 
     init() {
+      this.StartTime = Date.now()
       this.createEventListener()
     }
 
@@ -44,6 +45,8 @@ module.exports = {
         if (this.subscriptions.includes(event.method)) {
           this.events.push(event)
           console.log(event)
+          const delta = (Date.now() - this.StartTime) / 1000
+          console.log(`@${delta}s`)
         }
       })
     }
