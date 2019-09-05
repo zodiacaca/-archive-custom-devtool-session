@@ -76,10 +76,12 @@ const Bar = require('./classes/bar')
     persistent: true
   })
 
-  watcher.on('change', (path) => {
+  watcher.on('change', async (path) => {
     const ext = Path.extname(path)
     if (ext === '.html') {
-      const html = await fs.promises.readFile(path, { encoding: 'utf8' })
+      const html = await fs.promises.readFile(`${config.static}/${config.html}`,
+        { encoding: 'utf8' }
+      )
 
       await Customer.Order('Page.setDocumentContent',
         {
