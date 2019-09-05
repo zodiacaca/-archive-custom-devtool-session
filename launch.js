@@ -1,25 +1,14 @@
 
 const fs = require('fs')
 
-// const options = {
-//   persistent: true,
-//   recursive: true,
-//   encoding: 'utf8'
-// }
-// fs.watch('D:/DL/fdm', options, (eventType, filename) => {
-//   console.log(`event type is: ${eventType}`)
-//   if (filename) {
-//     console.log(`filename is: ${filename}`)
-//   } else {
-//     console.log('filename not provided')
-//   }
-// })
-
 const readConfig = require('./methods/readConfig')
 const config = readConfig(fs, __dirname + '/launch.json')
 
 const WebSocket = require('ws')
 const Puppeteer = require('puppeteer')
+
+const Path = require('path')
+const chokidar = require('chokidar');
 
 const Bar = require('./classes/bar')
 
@@ -79,64 +68,33 @@ const Bar = require('./classes/bar')
 
   Customer.Wonder('Page.loadEventFired')
 
-  const path = 'D:/DL/design/source/PageStackNavigation/index.html'
-  const html = await fs.promises.readFile(path, { encoding: 'utf8' })
+  /* ------------------------------
+    start watcher
+  ------------------------------ */
+  const watcher = chokidar.watch(config.static, {
+    ignored: /(^|[\/\\])\../,
+    persistent: true
+  })
 
-  // await Customer.Order('DOM.enable')
+  watcher.on('change', (path) => {
+    const ext = Path.extname(path)
+    if (ext === '.html') {
+      const html = await fs.promises.readFile(path, { encoding: 'utf8' })
 
-  // await Customer.Order('CSS.enable')
+      await Customer.Order('Page.setDocumentContent',
+        {
+          frameId: frameId,
+          html: html,
+        }
+      )
+    } else {
 
-  // await Customer.Order('DOM.getDocument')
-  // const rootId = (await Customer.GetReceipt()).root.nodeId
-  // // console.log('rootId:', rootId)
-
-  // await Customer.Order('DOM.querySelector',
-  //   {
-  //     nodeId: rootId,
-  //     selector: 'body',
-  //   },
-  // )
-  // const bodyId = (await Customer.GetReceipt()).nodeId
-  // // console.log('bodyId:', bodyId)
-
-  // await Customer.Order('CSS.getComputedStyleForNode',
-  //   {
-  //     nodeId: bodyId,
-  //   },
-  // )
-  // const styles = (await Customer.GetReceipt()).computedStyle
-  // // for (let key in styles) {
-  // //   console.log(styles[key])
-  // // }
-
-  // await Customer.Order('DOM.getFlattenedDocument')
-  // Customer.PrintReceipt()
-
-  await Bar.Bartender.Idle(2000)
-
-  await Customer.Order('Page.setDocumentContent',
-    {
-      frameId: frameId,
-      html: html,
     }
-  )
+  })
 
   // await Customer.Order('Page.reload',
   //   {
   //     ignoreCache: true,
   //   },
   // )
-
-  // await Customer.Check('Page.loadEventFired')
-
-  // await Bar.Bartender.Idle(2000)
-
-  // await Customer.Order('Page.captureScreenshot')
-  // const data = (await Customer.GetReceipt()).data
-  // // fs.writeFile("./tmp/data.txt", data, function(err) {
-  // //   err ? console.log(err) : console.log("File saved!")
-  // // })
-  // // fs.writeFile("./tmp/out.png", data, 'base64', function(err) {
-  // //   err ? console.log(err) : console.log("Image saved!")
-  // // })
 })()
