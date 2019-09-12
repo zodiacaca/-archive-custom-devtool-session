@@ -12,7 +12,31 @@ const chokidar = require('chokidar');
 
 const Bar = require('./classes/bar')
 
+const startExpress = () => {
+  return new Promise(resolve => {
+    const express = require('express')
+    const app = express()
+
+    app.use(express.static(config.static, {index: config.html}))
+
+    app.listen(3000, () => {
+      resolve('Server started...')
+    })
+  })
+}
+
 ;(async () => {
+  /* ------------------------------
+    start server
+  ------------------------------ */
+  if (config.internal) {
+    const started = await startExpress()
+    console.log(started)
+  }
+
+  /* ------------------------------
+    browser session
+  ------------------------------ */
   const launchOptions = {
     headless: false,
     executablePath: config.browser,
@@ -58,7 +82,8 @@ const Bar = require('./classes/bar')
 
   await Customer.Order('Page.navigate',
     {
-      url: 'https://cn.bing.com',
+      url: config.url + ':' + config.port,
+      // url: 'https://cn.bing.com',
       // url: 'https://store.steampowered.com',
       frameId: frameId,
     }
@@ -66,11 +91,11 @@ const Bar = require('./classes/bar')
 
   await Customer.Check('Page.loadEventFired')
 
-  Customer.Wonder('Page.loadEventFired')
-
   /* ------------------------------
     start watcher
   ------------------------------ */
+  Customer.Wonder('Page.loadEventFired')
+
   const watcher = chokidar.watch(config.static, {
     ignored: /(^|[\/\\])\../,
     persistent: true

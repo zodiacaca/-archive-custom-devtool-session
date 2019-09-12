@@ -4,14 +4,18 @@
     {
       "id": "1",
       "browser": "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
-      "static": "C:/Users/Zodiac/WebApp/zodiacaca.github.io/_site",
+      "static": "D:/DL/design/source/PageStackNavigation",
       "html": "index.html",
-      "url": "http://localhost:4000"
+      "internal": true,
+      "url": "http://127.0.0.1",
+      "port": 3000
     },
     {
       "id": "2",
       "browser": "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
-      "url": "http://localhost:5000"
+      "internal": false,
+      "url": "http://localhost",
+      "port": 4000
     }
   ]
 }
