@@ -19,8 +19,8 @@ const startExpress = () => {
 
     app.use(express.static(config.static, {index: config.html}))
 
-    app.listen(3000, () => {
-      resolve('Server started...')
+    app.listen(3000, function() {
+      resolve(this)
     })
   })
 }
@@ -33,25 +33,32 @@ const startExpress = () => {
     output: process.stdout
   })
 
-  rl.on('SIGINT', async function() {
+  rl.on('close', async () => {
     console.log('Closing browser...')
     await browser.close()
-    process.emit('SIGINT')
+    console.log('Closing server...')
+    await server.close()
   })
 
-  process.on('SIGINT', function() {
-    console.log('Exit')
-    // graceful shutdown
-    process.exit()
-  })
+  // rl.on('SIGINT', async function() {
+  //   console.log('Closing browser...')
+  //   await browser.close()
+  //   process.emit('SIGINT')
+  // })
+
+  // process.on('SIGINT', function() {
+  //   console.log('Exit')
+  //   // graceful shutdown
+  //   process.exit()
+  // })
 
   /* ------------------------------
     start server
   ------------------------------ */
-  if (config.internal) {
-    const started = await startExpress()
-    console.log(started)
-  }
+  // if (config.internal) {
+    const server = await startExpress()
+    console.log('Server started...')
+  // }
 
   /* ------------------------------
     browser session
