@@ -28,7 +28,7 @@ const startExpress = () => {
 ;(async () => {
   const process = require('process')
 
-  var rl = require('readline').createInterface({
+  const rl = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
   })
