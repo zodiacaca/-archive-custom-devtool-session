@@ -8,7 +8,7 @@ const WebSocket = require('ws')
 const Puppeteer = require('puppeteer')
 
 const Path = require('path')
-const chokidar = require('chokidar');
+const chokidar = require('chokidar')
 
 const Bar = require('./classes/bar')
 
@@ -26,6 +26,25 @@ const startExpress = () => {
 }
 
 ;(async () => {
+  const process = require('process')
+
+  var rl = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+
+  rl.on('SIGINT', async function() {
+    console.log('Closing browser...')
+    await browser.close()
+    process.emit('SIGINT')
+  })
+
+  process.on('SIGINT', function() {
+    console.log('Exit')
+    // graceful shutdown
+    process.exit()
+  })
+
   /* ------------------------------
     start server
   ------------------------------ */
@@ -114,7 +133,7 @@ const startExpress = () => {
           html: html,
         }
       )
-    } else {
+    } else if (ext === '.css') {
 
     }
   })
