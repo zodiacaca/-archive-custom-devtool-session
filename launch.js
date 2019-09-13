@@ -12,19 +12,6 @@ const chokidar = require('chokidar')
 
 const Bar = require('./classes/bar')
 
-const startExpress = () => {
-  return new Promise(resolve => {
-    const express = require('express')
-    const app = express()
-
-    app.use(express.static(config.static, {index: config.html}))
-
-    app.listen(3000, function() {
-      resolve(this)
-    })
-  })
-}
-
 ;(async () => {
   const process = require('process')
 
@@ -36,8 +23,6 @@ const startExpress = () => {
   rl.on('close', async () => {
     console.log('Closing browser...')
     await browser.close()
-    console.log('Closing server...')
-    await server.close()
   })
 
   // rl.on('SIGINT', async function() {
@@ -56,7 +41,7 @@ const startExpress = () => {
     start server
   ------------------------------ */
   // if (config.internal) {
-    const server = await startExpress()
+    const server = require('child_process').fork('express.js')
     console.log('Server started...')
   // }
 
