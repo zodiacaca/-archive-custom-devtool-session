@@ -1,9 +1,8 @@
 
-const fs = require('fs')
-
-const readConfig = require('./methods/readConfig')
-const config = readConfig(fs, __dirname + '/launch.json')
-
+const config = {
+  static: process.argv[2],
+  html: process.argv[3],
+}
 
 const express = require('express')
 const app = express()
