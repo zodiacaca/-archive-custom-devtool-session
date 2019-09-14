@@ -13,6 +13,11 @@ const chokidar = require('chokidar')
 const Bar = require('./classes/bar')
 
 ;(async () => {
+  const util = require('util');
+
+  /* ------------------------------
+    handle exit
+  ------------------------------ */
   const rl = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
@@ -38,8 +43,9 @@ const Bar = require('./classes/bar')
   /* ------------------------------
     start server
   ------------------------------ */
-  // if (config.internal) {
-    const server = require('child_process').fork('express.js', [config.static, config.html])
+  // if () {
+    const { fork } = require('child_process')
+    const server = fork('modules/express.js', [config.static, config.html])
     console.log('Server started...')
   // }
 

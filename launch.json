@@ -6,7 +6,6 @@
       "browser": "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
       "static": "D:/DL/design/source/PageStackNavigation",
       "html": "index.html",
-      "internal": true,
       "url": "http://127.0.0.1",
       "port": 3000
     },
